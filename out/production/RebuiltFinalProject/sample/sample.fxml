@@ -9,11 +9,11 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
-<?import javafx.scene.effect.InnerShadow?>
+<?import javafx.scene.effect.PerspectiveTransform?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" style="-fx-background-image: url('file:bg.jpg');" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" style="-fx-background-image: url('file:bg.jpg');" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
     <children>
         <TableView fx:id="table" layoutX="393.0" layoutY="80.0" prefHeight="500.0" prefWidth="400.0">
             <columns>
@@ -31,10 +31,7 @@
                 </TableColumn>
             </columns>
         </TableView>
-      <Button fx:id="deleteButton" layoutX="725.0" layoutY="583.0" mnemonicParsing="false" text="Remove">
-         <effect>
-            <InnerShadow />
-         </effect></Button>
+      <Button fx:id="deleteButton" layoutX="725.0" layoutY="583.0" mnemonicParsing="false" text="Remove"></Button>
       <ChoiceBox fx:id="monthPicker" layoutX="695.0" layoutY="38.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="6.0" prefWidth="97.0" />
       <Label layoutX="643.0" layoutY="43.0" prefHeight="17.0" prefWidth="50.0" text="Month:" />
       <Label layoutX="87.0" layoutY="76.0" prefHeight="38.0" prefWidth="196.0" text="New entry">

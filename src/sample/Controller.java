@@ -41,53 +41,13 @@ public class Controller implements Initializable{
 
     public ObservableList<Entry> filteredList = FXCollections.observableArrayList();
 
+
+
     @FXML
     private PieChart piechart;
 
-    @FXML
-    private void handleButton1Action(ActionEvent event) {
-        ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList(
-                        new PieChart.Data("January", 100),
-                        new PieChart.Data("February", 200),
-                        new PieChart.Data("March", 50),
-                        new PieChart.Data("April", 75),
-                        new PieChart.Data("May", 110),
-                        new PieChart.Data("June", 300),
-                        new PieChart.Data("July", 111),
-                        new PieChart.Data("August", 30),
-                        new PieChart.Data("September", 75),
-                        new PieChart.Data("October", 55),
-                        new PieChart.Data("November", 225),
-                        new PieChart.Data("December", 99));
-
-        piechart.setTitle("Monthly Record");
-        piechart.setData(pieChartData);
-    }
-
-    @FXML
-    private void handleButton2Action(ActionEvent event) {
-        ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList(
-                        new PieChart.Data("Sunday", 30),
-                        new PieChart.Data("Monday", 45),
-                        new PieChart.Data("Tuesday", 70),
-                        new PieChart.Data("Wednesday", 97),
-                        new PieChart.Data("Thursday", 100),
-                        new PieChart.Data("Friday", 80),
-                        new PieChart.Data("Saturday", 10));
-
-        piechart.setTitle("Weekly Record");
-        piechart.setData(pieChartData);
-    }
-
-    @FXML
-    private void handleButtonClearAction(ActionEvent event) {
-        ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList();
-        piechart.setTitle("");
-        piechart.setData(pieChartData);
-    }
+    private int januaryTotal = 0;
+    private int februaryTotal = 0;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -127,7 +87,7 @@ public class Controller implements Initializable{
                         filteredList.remove(0, filteredList.size());
                         filteredList.addAll(list);
                         for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 01) {
+                            if (filteredList.get(i).getMonth() != 1) {
                                 filteredList.remove(i);
                                 i--;
                             }
@@ -139,7 +99,7 @@ public class Controller implements Initializable{
                         filteredList.remove(0, filteredList.size());
                         filteredList.addAll(list);
                         for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 02) {
+                            if (filteredList.get(i).getMonth() != 2) {
                                 filteredList.remove(i);
                                 i--;
                             }
@@ -151,7 +111,106 @@ public class Controller implements Initializable{
                         filteredList.remove(0, filteredList.size());
                         filteredList.addAll(list);
                         for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 03) {
+                            if (filteredList.get(i).getMonth() != 3) {
+                                filteredList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+                    else if (newValue == "April") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+                        for (int i = 0; i < filteredList.size();i++) {
+                            if (filteredList.get(i).getMonth() != 4) {
+                                filteredList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+                    else if (newValue == "May") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+                        for (int i = 0; i < filteredList.size();i++) {
+                            if (filteredList.get(i).getMonth() != 5) {
+                                filteredList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+                    else if (newValue == "June") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+                        for (int i = 0; i < filteredList.size();i++) {
+                            if (filteredList.get(i).getMonth() != 6) {
+                                filteredList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+                    else if (newValue == "July") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+                        for (int i = 0; i < filteredList.size();i++) {
+                            if (filteredList.get(i).getMonth() != 7) {
+                                filteredList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+                    else if (newValue == "August") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+                        for (int i = 0; i < filteredList.size();i++) {
+                            if (filteredList.get(i).getMonth() != 8) {
+                                filteredList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+                    else if (newValue == "September") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+                        for (int i = 0; i < filteredList.size();i++) {
+                            if (filteredList.get(i).getMonth() != 9) {
+                                filteredList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+                    else if (newValue == "Octobert") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+                        for (int i = 0; i < filteredList.size();i++) {
+                            if (filteredList.get(i).getMonth() != 10) {
+                                filteredList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+                    else if (newValue == "November") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+                        for (int i = 0; i < filteredList.size();i++) {
+                            if (filteredList.get(i).getMonth() != 11) {
+                                filteredList.remove(i);
+                                i--;
+                            }
+
+                        }
+                    }
+                    else if (newValue == "December") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+                        for (int i = 0; i < filteredList.size();i++) {
+                            if (filteredList.get(i).getMonth() != 12) {
                                 filteredList.remove(i);
                                 i--;
                             }
@@ -163,29 +222,13 @@ public class Controller implements Initializable{
 
         //SETTING PIECHART DATA
 
-        ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList(
-                        new PieChart.Data("January", 100),
-                        new PieChart.Data("February", 200),
-                        new PieChart.Data("March", 50),
-                        new PieChart.Data("April", 75),
-                        new PieChart.Data("May", 110),
-                        new PieChart.Data("June", 300),
-                        new PieChart.Data("July", 111),
-                        new PieChart.Data("August", 30),
-                        new PieChart.Data("September", 75),
-                        new PieChart.Data("October", 55),
-                        new PieChart.Data("November", 225),
-                        new PieChart.Data("December", 99));
-
-        piechart.setTitle("Monthly Record");
-        piechart.setData(pieChartData);
+        chartUpdater();
 
 
 
 
 
-        //set date in date picker
+        //set default date in date picker as current day
 
         String date = new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -214,6 +257,8 @@ public class Controller implements Initializable{
 
                 //removes the item selected
                 table.getItems().remove(selectedItem);
+                list.remove(selectedItem);
+                chartUpdater();
 
                 //creates a formatted string for the output
 
@@ -239,5 +284,26 @@ public class Controller implements Initializable{
 
         });
 
+    }
+
+    private void chartUpdater() {
+        for (int i = 0; i < list.size();i++) {
+            if (list.get(i).getMonth() == 1) {
+                januaryTotal += list.get(i).getValue();
+            }
+            else if (list.get(i).getMonth() == 2) {
+                februaryTotal += list.get(i).getValue();
+
+            }
+        }
+        ;
+
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList(
+                        new PieChart.Data("January", januaryTotal),
+                        new PieChart.Data("February", februaryTotal));
+
+        piechart.setTitle("Monthly Record");
+        piechart.setData(pieChartData);
     }
 }
