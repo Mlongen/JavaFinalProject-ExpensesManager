@@ -3,13 +3,19 @@ package sample;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Group;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.ChoiceBox;
 import java.io.*;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Controller implements Initializable{
@@ -28,9 +34,60 @@ public class Controller implements Initializable{
     @FXML
     private ChoiceBox monthPicker;
 
+    @FXML
+    private DatePicker datePicker;
+
     public ObservableList<Entry> list = FXCollections.observableArrayList();
 
     public ObservableList<Entry> filteredList = FXCollections.observableArrayList();
+
+    @FXML
+    private PieChart piechart;
+
+    @FXML
+    private void handleButton1Action(ActionEvent event) {
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList(
+                        new PieChart.Data("January", 100),
+                        new PieChart.Data("February", 200),
+                        new PieChart.Data("March", 50),
+                        new PieChart.Data("April", 75),
+                        new PieChart.Data("May", 110),
+                        new PieChart.Data("June", 300),
+                        new PieChart.Data("July", 111),
+                        new PieChart.Data("August", 30),
+                        new PieChart.Data("September", 75),
+                        new PieChart.Data("October", 55),
+                        new PieChart.Data("November", 225),
+                        new PieChart.Data("December", 99));
+
+        piechart.setTitle("Monthly Record");
+        piechart.setData(pieChartData);
+    }
+
+    @FXML
+    private void handleButton2Action(ActionEvent event) {
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList(
+                        new PieChart.Data("Sunday", 30),
+                        new PieChart.Data("Monday", 45),
+                        new PieChart.Data("Tuesday", 70),
+                        new PieChart.Data("Wednesday", 97),
+                        new PieChart.Data("Thursday", 100),
+                        new PieChart.Data("Friday", 80),
+                        new PieChart.Data("Saturday", 10));
+
+        piechart.setTitle("Weekly Record");
+        piechart.setData(pieChartData);
+    }
+
+    @FXML
+    private void handleButtonClearAction(ActionEvent event) {
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList();
+        piechart.setTitle("");
+        piechart.setData(pieChartData);
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -104,21 +161,36 @@ public class Controller implements Initializable{
                 }
         );
 
+        //SETTING PIECHART DATA
+
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList(
+                        new PieChart.Data("January", 100),
+                        new PieChart.Data("February", 200),
+                        new PieChart.Data("March", 50),
+                        new PieChart.Data("April", 75),
+                        new PieChart.Data("May", 110),
+                        new PieChart.Data("June", 300),
+                        new PieChart.Data("July", 111),
+                        new PieChart.Data("August", 30),
+                        new PieChart.Data("September", 75),
+                        new PieChart.Data("October", 55),
+                        new PieChart.Data("November", 225),
+                        new PieChart.Data("December", 99));
+
+        piechart.setTitle("Monthly Record");
+        piechart.setData(pieChartData);
 
 
 
 
 
+        //set date in date picker
 
-
-
-
-
-
-
-
-
-
+        String date = new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate localDate = LocalDate.parse(date , formatter);
+        datePicker.setValue(localDate);
 
 
 
