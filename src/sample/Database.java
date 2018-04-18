@@ -17,67 +17,7 @@ public class Database {
         return objects;
     }
 
-//    public  ArrayList<Entry> getObjectsJanuary() {
-//        ArrayList<Entry> temp = new ArrayList<>();
-//        for (int i = 0; i < objects.size();i++) {
-//            if (objects.get(i).getMonth() == 01) {
-//                temp.add(objects.get(i));
-//            }
-//            return temp;
-//        }
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsFebruary() {
-//        ArrayList<Entry> temp = new ArrayList<>();
-//        for (int i = 0; i < objects.size();i++) {
-//            if (objects.get(i).getMonth() == 02) {
-//                temp.add(objects.get(i));
-//            }
-//            return temp;
-//        }
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsMarch() {
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsApril() {
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsMay() {
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsJune() {
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsJuly() {
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsAugust() {
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsSeptember() {
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsOctober() {
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsNovember() {
-//        return objects;
-//    }
-//
-//    public  ArrayList<Entry> getObjectsDecember() {
-//        return objects;
-//    }
+
     public ArrayList<String> getObjectsDescription() {
         ArrayList<String> result = new ArrayList<>();
         for (int i = 0;i < objects.size();i++) {

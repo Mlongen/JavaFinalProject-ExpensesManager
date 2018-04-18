@@ -20,6 +20,7 @@ import java.util.*;
 
 public class Controller implements Initializable{
 
+
     private Database database;
     @FXML
     private TableView<Entry> table;
@@ -35,12 +36,29 @@ public class Controller implements Initializable{
     private ChoiceBox monthPicker;
 
     @FXML
+    private ChoiceBox categoryPicker;
+
+    @FXML
+    private Button addCategory;
+
+    @FXML
+    private Button removeCategory;
+
+    @FXML
+    private Button categoryOK;
+
+    @FXML
+    private TextField categoryAdder;
+
+    @FXML
     private DatePicker datePicker;
+
 
     public ObservableList<Entry> list = FXCollections.observableArrayList();
 
     public ObservableList<Entry> filteredList = FXCollections.observableArrayList();
 
+    ObservableList<String> categoryList = FXCollections.observableArrayList();
 
 
     @FXML
@@ -48,26 +66,53 @@ public class Controller implements Initializable{
 
     private int januaryTotal = 0;
     private int februaryTotal = 0;
+    private int marchTotal = 0;
+    private int aprilTotal = 0;
+    private int mayTotal = 0;
+    private int juneTotal = 0;
+    private int julyTotal = 0;
+    private int augustTotal = 0;
+    private int septemberTotal = 0;
+    private int octoberTotal = 0;
+    private int novemberTotal = 0;
+    private int decemberTotal = 0;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Scanner input = null;
+
+
+        // READING FILES
+        Scanner inputdb = null;
         try {
-            input = new Scanner(new File("database.txt"));
+            inputdb = new Scanner(new File("database.txt"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        //reading text file
-        String read = input.nextLine();
+
+
+
+        //reading database file
+        String readdb = inputdb.nextLine();
+        //reading category file
+
+
+
+
+
         // creating new database object
         Database db = new Database();
         //populating database with scanner read
-        db.readAndCreateArray(read);
+        db.readAndCreateArray(readdb);
         //creating observablelist to display tables
         list = FXCollections.observableArrayList(db.getObjects());
         filteredList.addAll(list);
         System.out.println(filteredList);
+
+
+
+        //reading category text file
 
 
 
@@ -80,10 +125,98 @@ public class Controller implements Initializable{
 
         // Setting choiceBox Items
         monthPicker.setItems(FXCollections.observableArrayList(
-                "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+                 "All", "Past 30 days", "Past 90 days", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
         );
+
+
+
+        //category manager
+        categoryOK.setVisible(false);
+        categoryAdder.setVisible(false);
+        categoryList = FXCollections.observableArrayList();
+        Scanner inputcategory = null;
+        try {
+            inputcategory = new Scanner(new File("category.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String readcategory = inputcategory.nextLine();
+        String[] splittedcategory = readcategory.split(";");
+        categoryList.addAll(splittedcategory);
+        categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
+
+        addCategory.pressedProperty().addListener((o, old, newValue) ->
+                categoryAdder.setVisible(true));
+        addCategory.pressedProperty().addListener((o, old, newValue) ->
+                categoryOK.setVisible(true));
+
+
+        categoryOK.setOnAction(e -> {
+            String categoryadderinput = categoryAdder.getCharacters().toString();
+            categoryList.add(categoryadderinput);
+            categoryAdder.setVisible(false);
+            categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
+
+           String[] categories = new String[categoryList.size()];
+           for (int i = 0; i < categoryList.size();i++) {
+               categories[i] = categoryList.get(i).toString();
+           }
+           String categoriesoutput = String.join(";", categories);
+            try (PrintWriter out = new PrintWriter(new FileWriter("category.txt", false))) {
+                out.println(categoriesoutput);
+            } catch (IOException z) {
+                z.printStackTrace();
+            }
+            categoryOK.setVisible(false);
+
+        });
+
+        //REMOVE BUTTON FOR CATEGORIES
+
+        removeCategory.setOnAction(e -> {
+            Object selectedString = categoryPicker.getSelectionModel().getSelectedItem();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Category removal");
+            alert.setContentText("Are you sure you want to delete this category?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+
+                //removes the item selected
+                categoryPicker.getItems().remove(selectedString);
+                categoryList.remove(selectedString);
+
+                //creates a formatted string for the output
+
+                String[] categories = new String[categoryList.size()];
+                for (int i = 0; i < categoryList.size();i++) {
+                    categories[i] = categoryList.get(i).toString();
+                }
+                String categoriesRemovedOutput = String.join(";", categories);
+                try (PrintWriter out = new PrintWriter(new FileWriter("category.txt", false))) {
+                    out.println(categoriesRemovedOutput);
+                } catch (IOException z) {
+                    z.printStackTrace();
+                }
+                categoryOK.setVisible(false);
+
+            }
+            else {
+                // ... user chose CANCEL or closed the dialog
+            }
+
+        });
+
+
+
         monthPicker.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
-                    if (newValue == "January") {
+
+                    if (newValue == "All") {
+                        filteredList.remove(0, filteredList.size());
+                        filteredList.addAll(list);
+
+                    }
+                    else if (newValue == "January") {
                         filteredList.remove(0, filteredList.size());
                         filteredList.addAll(list);
                         for (int i = 0; i < filteredList.size();i++) {
@@ -184,7 +317,7 @@ public class Controller implements Initializable{
 
                         }
                     }
-                    else if (newValue == "Octobert") {
+                    else if (newValue == "October") {
                         filteredList.remove(0, filteredList.size());
                         filteredList.addAll(list);
                         for (int i = 0; i < filteredList.size();i++) {
@@ -225,24 +358,12 @@ public class Controller implements Initializable{
         chartUpdater();
 
 
-
-
-
         //set default date in date picker as current day
 
         String date = new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDate localDate = LocalDate.parse(date , formatter);
         datePicker.setValue(localDate);
-
-
-
-
-
-
-
-
-
 
 
         //delete button action
@@ -287,6 +408,18 @@ public class Controller implements Initializable{
     }
 
     private void chartUpdater() {
+        januaryTotal = 0;
+        februaryTotal = 0;
+        marchTotal = 0;
+        aprilTotal = 0;
+        mayTotal = 0;
+        juneTotal = 0;
+        julyTotal = 0;
+        augustTotal = 0;
+        septemberTotal = 0;
+        octoberTotal = 0;
+        novemberTotal = 0;
+        decemberTotal = 0;
         for (int i = 0; i < list.size();i++) {
             if (list.get(i).getMonth() == 1) {
                 januaryTotal += list.get(i).getValue();
@@ -295,15 +428,67 @@ public class Controller implements Initializable{
                 februaryTotal += list.get(i).getValue();
 
             }
+            else if (list.get(i).getMonth() == 3) {
+                marchTotal += list.get(i).getValue();
+
+            }
+            else if (list.get(i).getMonth() == 4) {
+                aprilTotal += list.get(i).getValue();
+
+            }
+            else if (list.get(i).getMonth() == 5) {
+                mayTotal += list.get(i).getValue();
+
+            }
+            else if (list.get(i).getMonth() == 6) {
+                juneTotal += list.get(i).getValue();
+
+            }
+            else if (list.get(i).getMonth() == 7) {
+                julyTotal += list.get(i).getValue();
+
+            }
+            else if (list.get(i).getMonth() == 8) {
+                augustTotal += list.get(i).getValue();
+
+            }
+            else if (list.get(i).getMonth() == 9) {
+                septemberTotal += list.get(i).getValue();
+
+            }
+            else if (list.get(i).getMonth() == 10) {
+                octoberTotal += list.get(i).getValue();
+
+            }
+            else if (list.get(i).getMonth() == 11) {
+                novemberTotal += list.get(i).getValue();
+
+            }
+            else if (list.get(i).getMonth() == 12) {
+                decemberTotal += list.get(i).getValue();
+
+            }
+
         }
         ;
 
         ObservableList<PieChart.Data> pieChartData =
                 FXCollections.observableArrayList(
-                        new PieChart.Data("January", januaryTotal),
-                        new PieChart.Data("February", februaryTotal));
+                        new PieChart.Data("January: $" + januaryTotal, januaryTotal),
+                        new PieChart.Data("February: $" + februaryTotal, februaryTotal),
+                        new PieChart.Data("March: $" + marchTotal, marchTotal),
+                        new PieChart.Data("April: $" + aprilTotal, aprilTotal),
+                        new PieChart.Data("May: $" + mayTotal, mayTotal),
+                        new PieChart.Data("June: $" + juneTotal, juneTotal),
+                        new PieChart.Data("July: $" + julyTotal, julyTotal),
+                        new PieChart.Data("August: $" + augustTotal, augustTotal),
+                        new PieChart.Data("September: $" + septemberTotal, septemberTotal),
+                        new PieChart.Data("October: $" + octoberTotal, octoberTotal),
+                        new PieChart.Data("November: $" + novemberTotal, novemberTotal),
+                        new PieChart.Data("December: $" + decemberTotal, decemberTotal));
 
-        piechart.setTitle("Monthly Record");
+
+        piechart.setTitle("Monthly analysis");
         piechart.setData(pieChartData);
     }
 }

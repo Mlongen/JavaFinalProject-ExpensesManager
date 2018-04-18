@@ -5,11 +5,14 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
-<?import javafx.scene.effect.PerspectiveTransform?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
@@ -17,11 +20,11 @@
     <children>
         <TableView fx:id="table" layoutX="393.0" layoutY="80.0" prefHeight="500.0" prefWidth="400.0">
             <columns>
-                <TableColumn fx:id="description" prefWidth="144.0" text="Description">
+                <TableColumn fx:id="description" prefWidth="144.0" style="-fx-alignment: CENTER;" text="Description">
                     <cellValueFactory><PropertyValueFactory property="description" />
                     </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="value" prefWidth="152.0" text="Value">
+                <TableColumn fx:id="value" editable="false" prefWidth="152.0" style="-fx-alignment: CENTER;" text="Value">
                     <cellValueFactory><PropertyValueFactory property="value" />
                     </cellValueFactory>
                 </TableColumn>
@@ -31,7 +34,8 @@
                 </TableColumn>
             </columns>
         </TableView>
-      <Button fx:id="deleteButton" layoutX="725.0" layoutY="583.0" mnemonicParsing="false" text="Remove"></Button>
+      <Button fx:id="deleteButton" layoutX="725.0" layoutY="614.0" mnemonicParsing="false" text="Remove">
+         </Button>
       <ChoiceBox fx:id="monthPicker" layoutX="695.0" layoutY="38.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="6.0" prefWidth="97.0" />
       <Label layoutX="643.0" layoutY="43.0" prefHeight="17.0" prefWidth="50.0" text="Month:" />
       <Label layoutX="87.0" layoutY="76.0" prefHeight="38.0" prefWidth="196.0" text="New entry">
@@ -53,17 +57,62 @@
             <Font size="9.0" />
          </font>
       </TextField>
-      <Label layoutX="86.0" layoutY="311.0" text="Category" />
-      <TextField layoutX="85.0" layoutY="330.0" prefHeight="27.0" prefWidth="150.0">
-         <font>
-            <Font size="9.0" />
-         </font>
-      </TextField>
-      <PieChart fx:id="piechart" layoutX="799.0" layoutY="173.0" prefHeight="325.0" prefWidth="400.0" />
+      <Label layoutX="86.0" layoutY="360.0" text="Category" />
+      <PieChart fx:id="piechart" layoutX="799.0" layoutY="178.0" prefHeight="325.0" prefWidth="400.0" />
       <Label layoutX="826.0" layoutY="71.0" prefHeight="38.0" prefWidth="196.0" text="Details">
          <font>
             <Font size="31.0" />
          </font>
       </Label>
+      <RadioButton layoutX="74.0" layoutY="308.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="78.0" scaleX="0.7" scaleY="0.7" selected="true" text="In">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </RadioButton>
+      <RadioButton layoutX="121.0" layoutY="308.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="78.0" scaleX="0.6" scaleY="0.6" scaleZ="0.6" text="Out">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </RadioButton>
+      <Button layoutX="855.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="158.0" text="Details per month" />
+      <Button layoutX="1014.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="158.0" text="Details per category" />
+      <Label layoutX="493.0" layoutY="577.0" prefHeight="31.0" prefWidth="40.0" text="Sum:" />
+      <Label layoutX="593.0" layoutY="583.0" text="\$1000.00" />
+      <MenuBar layoutX="1.0" prefHeight="21.0" prefWidth="1199.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Import">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <ChoiceBox fx:id="categoryPicker" layoutX="85.0" layoutY="389.0" prefWidth="150.0" />
+      <Button fx:id="addCategory" layoutX="148.0" layoutY="421.0" mnemonicParsing="false" text="Add">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Button>
+      <Button fx:id="removeCategory" layoutX="182.0" layoutY="421.0" mnemonicParsing="false" text="Remove">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Button>
+      <TextField fx:id="categoryAdder" layoutX="85.0" layoutY="390.0" prefHeight="26.0" prefWidth="150.0" />
+      <Button  fx:id="categoryOK" layoutX="239.0" layoutY="393.0" mnemonicParsing="false" text="OK">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Button>
     </children>
 </Pane>
