@@ -2,13 +2,10 @@ package sample;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Group;
-import javafx.scene.chart.PieChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.ChoiceBox;
@@ -38,11 +35,6 @@ public class Controller implements Initializable{
     @FXML
     private TableColumn<Entry, String> category;
 
-
-
-
-
-
     @FXML
     private TextField descriptionTextField;
 
@@ -66,6 +58,11 @@ public class Controller implements Initializable{
     @FXML
     private ChoiceBox monthPicker;
 
+
+
+
+    //CATEGORY STUFF
+
     @FXML
     private ChoiceBox categoryPicker;
 
@@ -82,6 +79,8 @@ public class Controller implements Initializable{
     private TextField categoryAdder;
 
 
+    //DATE FILTER STUFF
+
 
     @FXML
     private DatePicker fromDatePicker;
@@ -91,6 +90,21 @@ public class Controller implements Initializable{
 
     @FXML
     private ChoiceBox filterPicker;
+
+
+    //BUDGET STUFF
+
+    @FXML
+    private Button addBudget;
+
+    @FXML
+    private Button removeBudget;
+
+    @FXML
+    private ChoiceBox budgetCategoryChooser;
+
+
+
 
 
     //parameter that helps calculate fromRange of date period
@@ -122,6 +136,25 @@ public class Controller implements Initializable{
     private int octoberTotal = 0;
     private int novemberTotal = 0;
     private int decemberTotal = 0;
+
+
+    @FXML
+    private BarChart<String, Number> barChart;
+
+    @FXML
+    private Button barChartButton;
+
+    @FXML
+    private Button pieChartButton;
+
+    @FXML
+    private LineChart lineChart;
+
+    @FXML
+    private NumberAxis yAxis;
+
+    @FXML
+    private CategoryAxis xAxis;
 
 
     @Override
@@ -248,6 +281,20 @@ public class Controller implements Initializable{
         });
 
         //REMOVE BUTTON FOR CATEGORIES
+
+        barChart.setVisible(false);
+
+        barChartButton.setOnAction((e -> {
+            piechart.setVisible(false);
+            barChart.setVisible(true);
+
+        }));
+
+        pieChartButton.setOnAction((e -> {
+            barChart.setVisible(false);
+            piechart.setVisible(true);
+
+        }));
 
         removeCategory.setOnAction(e -> {
             Object selectedString = categoryPicker.getSelectionModel().getSelectedItem();
@@ -634,7 +681,10 @@ public class Controller implements Initializable{
             }
 
         }
-        ;
+
+
+
+        //PIE CHART
 
         ObservableList<PieChart.Data> pieChartData =
                 FXCollections.observableArrayList(
@@ -654,5 +704,46 @@ public class Controller implements Initializable{
 
         piechart.setTitle("Monthly analysis");
         piechart.setData(pieChartData);
+
+
+        //BARCHART
+
+
+        xAxis.setCategories(FXCollections.observableArrayList(Arrays.asList("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "December")));
+        yAxis.setLabel("Value");
+
+        barChart.setTitle("Monthly analysis");
+
+        XYChart.Series<String, Number> moneySpent = new XYChart.Series<>();
+        moneySpent.setName("Money spent");
+        moneySpent.getData().add(new XYChart.Data<>("January", januaryTotal));
+        moneySpent.getData().add(new XYChart.Data<>("February", februaryTotal));
+        moneySpent.getData().add(new XYChart.Data<>("March", marchTotal));
+        moneySpent.getData().add(new XYChart.Data<>("April", aprilTotal));
+        moneySpent.getData().add(new XYChart.Data<>("May", mayTotal));
+        moneySpent.getData().add(new XYChart.Data<>("June", juneTotal));
+        moneySpent.getData().add(new XYChart.Data<>("July", julyTotal));
+        moneySpent.getData().add(new XYChart.Data<>("August", augustTotal));
+        moneySpent.getData().add(new XYChart.Data<>("September", septemberTotal));
+        moneySpent.getData().add(new XYChart.Data<>("October", octoberTotal));
+        moneySpent.getData().add(new XYChart.Data<>("November", novemberTotal));
+        moneySpent.getData().add(new XYChart.Data<>("December", decemberTotal));
+
+        barChart.getData().clear();
+        barChart.getData().add(moneySpent);
+
+
+
+
+        lineChart.setVisible(false);
+        //LINE CHART
+
+
+
+
     }
+
+
+
+
 }
