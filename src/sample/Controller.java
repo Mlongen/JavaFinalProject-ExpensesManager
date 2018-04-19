@@ -38,6 +38,25 @@ public class Controller implements Initializable{
     @FXML
     private TableColumn<Entry, String> category;
 
+
+
+
+
+
+    @FXML
+    private TextField descriptionTextField;
+
+    @FXML
+    private TextField valueTextField;
+
+    @FXML
+    private DatePicker datePicker;
+
+    @FXML
+    private Button addEntry;
+
+
+
     @FXML
     private Button deleteButton;
 
@@ -62,8 +81,7 @@ public class Controller implements Initializable{
     @FXML
     private TextField categoryAdder;
 
-    @FXML
-    private DatePicker datePicker;
+
 
     @FXML
     private DatePicker fromDatePicker;
@@ -136,11 +154,41 @@ public class Controller implements Initializable{
         //creating observablelist to display tables
         list = FXCollections.observableArrayList(db.getObjects());
         filteredList.addAll(list);
-        System.out.println(filteredList);
 
 
 
-        //reading category text file
+        //adding new entry
+
+        addEntry.setOnAction (e -> {
+
+            String description = descriptionTextField.getText().toString();
+            double value = Double.valueOf(valueTextField.getText());
+            int year = Integer.valueOf(datePicker.getValue().toString().substring(0, 4));
+            int month = Integer.valueOf(datePicker.getValue().toString().substring(5, 7));
+            int day = Integer.valueOf(datePicker.getValue().toString().substring(9, 10));
+            String category = categoryPicker.getSelectionModel().getSelectedItem().toString();
+
+            Entry newEntry = new Entry(description, value, day, month, year, category);
+            list.add(newEntry);
+            filteredList.add(newEntry);
+            chartUpdater();
+
+            List<String> formattingString = new ArrayList<>();
+            for (int i = 0; i < list.size();i++) {
+                formattingString.add(list.get(i).getDescription() + ";" + list.get(i).getValue() + ";" + list.get(i).getDay() + ";" +
+                        list.get(i).getMonth() + ";" + list.get(i).getYear() + ";" + list.get(i).getCategory());
+            }
+            String formattedString = String.join(";", formattingString);
+
+            //saves output file
+
+            try (PrintWriter out = new PrintWriter(new FileWriter("database.txt", false))) {
+                out.println(formattedString);
+            } catch (IOException z) {
+                z.printStackTrace();
+            }
+
+        });
 
 
 

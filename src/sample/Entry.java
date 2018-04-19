@@ -12,8 +12,7 @@ public class Entry  {
     private SimpleIntegerProperty year;
     private SimpleStringProperty category;
 
-    public Entry() {
-    }
+
 
     public Entry(String description, double value, int day, int month, int year, String category) {
         this.description = new SimpleStringProperty(description);
