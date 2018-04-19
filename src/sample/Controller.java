@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -30,8 +31,13 @@ public class Controller implements Initializable{
     private TableColumn<Entry, String> description;
     @FXML
     private TableColumn<Entry, Double> value;
+
+    @FXML
+    private TableColumn<Entry, String> date;
+
     @FXML
     private TableColumn<Entry, String> category;
+
     @FXML
     private Button deleteButton;
 
@@ -66,14 +72,13 @@ public class Controller implements Initializable{
     private DatePicker toDatePicker;
 
     @FXML
-    private Button dateFilterButton;
-
-    @FXML
     private ChoiceBox filterPicker;
 
 
+    //parameter that helps calculate fromRange of date period
     private long fromMillis;
 
+    //parameter that helps calculate toRange of date period
     private long toMillis;
 
 
@@ -143,6 +148,7 @@ public class Controller implements Initializable{
         description.setCellValueFactory(new PropertyValueFactory<Entry, String>("description"));
         value.setCellValueFactory(new PropertyValueFactory<Entry, Double>("value"));
         category.setCellValueFactory(new PropertyValueFactory<Entry, String>("category"));
+        date.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(String.valueOf(cellData.getValue().getDay() + "/" +cellData.getValue().getMonth())));
         table.setItems(filteredList);
         //listening for changes
 
@@ -150,7 +156,6 @@ public class Controller implements Initializable{
         monthPicker.setItems(FXCollections.observableArrayList(
                   "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
         );
-
 
 
         //category manager
@@ -231,8 +236,6 @@ public class Controller implements Initializable{
         });
 
 
-
-
         //SETTING UP DATE PICKERS AND FILTERS
 
         fromMillis = 0;
@@ -254,6 +257,8 @@ public class Controller implements Initializable{
         );
 
         toDatePicker.setOnAction(e -> {
+
+            //GETTING THE DATE
             String fromValue = toDatePicker.getValue().toString();
             SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
             Date fromDate = null;
@@ -263,12 +268,8 @@ public class Controller implements Initializable{
                 e1.printStackTrace();
             }
             toMillis = fromDate.getTime();
-            System.out.println(toMillis);
 
-                }
-        );
-
-        dateFilterButton.setOnAction(e -> {
+            // POPULATING THE FILTEREDLIST
             filteredList.remove(0, filteredList.size());
             for (int i = 0; i < list.size(); i++) {
 
@@ -291,7 +292,9 @@ public class Controller implements Initializable{
                 }
 
             }
-        });
+
+                }
+        );
 
         filterPicker.setItems(FXCollections.observableArrayList(
                 "Period", "Month")
@@ -301,7 +304,6 @@ public class Controller implements Initializable{
         monthLabel.setVisible(false);
         fromDatePicker.setVisible(false);
         toDatePicker.setVisible(false);
-        dateFilterButton.setVisible(false);
 
         filterPicker.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
                 if (newValue == "Period") {
@@ -309,7 +311,6 @@ public class Controller implements Initializable{
                     monthLabel.setVisible(false);
                     fromDatePicker.setVisible(true);
                     toDatePicker.setVisible(true);
-                    dateFilterButton.setVisible(true);
 
 
                 }
@@ -318,7 +319,6 @@ public class Controller implements Initializable{
                     monthLabel.setVisible(true);
                     fromDatePicker.setVisible(false);
                     toDatePicker.setVisible(false);
-                    dateFilterButton.setVisible(false);
 
                 }}
             );

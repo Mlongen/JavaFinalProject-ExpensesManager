@@ -1,1 +1,1 @@
-another;another
+Utilities;Parties;Food;Other;Beer

@@ -12,31 +12,25 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-image: url('file:bg.jpg');" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
     <children>
-        <TableView fx:id="table" layoutX="362.0" layoutY="88.0" prefHeight="500.0" prefWidth="454.0">
+        <TableView fx:id="table" layoutX="362.0" layoutY="88.0" prefHeight="500.0" prefWidth="524.0">
             <columns>
                 <TableColumn fx:id="description" prefWidth="144.0" style="-fx-alignment: CENTER;" text="Description">
-                    <cellValueFactory><PropertyValueFactory property="description" />
-                    </cellValueFactory>
                 </TableColumn>
                 <TableColumn fx:id="value" editable="false" prefWidth="152.0" style="-fx-alignment: CENTER;" text="Value">
-                    <cellValueFactory><PropertyValueFactory property="value" />
-                    </cellValueFactory>
                 </TableColumn>
-                <TableColumn fx:id="category" prefWidth="103.0" text="Category">
-                    <cellValueFactory><PropertyValueFactory property="category" />
-                    </cellValueFactory>
+                <TableColumn fx:id="date" prefWidth="100.3651123046875" style="-fx-alignment: CENTER;" text="Date" />
+                <TableColumn fx:id="category" prefWidth="100.6348876953125" style="-fx-alignment: CENTER;" text="Category">
                 </TableColumn>
             </columns>
         </TableView>
-      <Button fx:id="deleteButton" layoutX="735.0" layoutY="597.0" mnemonicParsing="false" text="Remove">
+      <Button fx:id="deleteButton" layoutX="801.0" layoutY="606.0" mnemonicParsing="false" text="Remove">
          </Button>
-      <ChoiceBox fx:id="monthPicker" layoutX="713.0" layoutY="49.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="6.0" prefWidth="97.0" />
+      <ChoiceBox fx:id="monthPicker" layoutX="717.0" layoutY="49.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="6.0" prefWidth="97.0" />
       <Label fx:id="monthLabel" layoutX="646.0" layoutY="55.0" prefHeight="17.0" prefWidth="50.0" text="Month:" />
       <Label layoutX="87.0" layoutY="76.0" prefHeight="38.0" prefWidth="196.0" text="New entry">
          <font>
@@ -58,8 +52,8 @@
          </font>
       </TextField>
       <Label layoutX="86.0" layoutY="360.0" text="Category" />
-      <PieChart fx:id="piechart" layoutX="878.0" layoutY="178.0" prefHeight="325.0" prefWidth="400.0" />
-      <Label layoutX="886.0" layoutY="71.0" prefHeight="38.0" prefWidth="196.0" text="Details">
+      <PieChart fx:id="piechart" layoutX="854.0" layoutY="178.0" prefHeight="441.0" prefWidth="530.0" />
+      <Label layoutX="892.0" layoutY="71.0" prefHeight="38.0" prefWidth="196.0" text="Details">
          <font>
             <Font size="31.0" />
          </font>
@@ -74,8 +68,8 @@
             <Font size="18.0" />
          </font>
       </RadioButton>
-      <Button layoutX="913.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="158.0" text="Details per month" />
-      <Button layoutX="1072.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="158.0" text="Details per category" />
+      <Button layoutX="904.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="223.0" text="Details per month" />
+      <Button layoutX="1130.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="223.0" text="Details per category" />
       <Label layoutX="493.0" layoutY="590.0" prefHeight="31.0" prefWidth="40.0" text="Sum:" />
       <Label layoutX="593.0" layoutY="595.0" text="\$1000.00" />
       <MenuBar layoutX="1.0" prefHeight="21.0" prefWidth="1199.0">
@@ -115,10 +109,8 @@
          </font>
       </Button>
       <Label layoutX="365.0" layoutY="54.0" prefHeight="18.0" prefWidth="65.0" text="Filter by:" />
-      <Label layoutX="277.0" layoutY="137.0" prefHeight="17.0" prefWidth="50.0" text="from:" />
       <DatePicker fx:id="fromDatePicker" layoutX="546.0" layoutY="50.0" prefHeight="18.0" prefWidth="115.0" promptText="From" />
       <DatePicker fx:id="toDatePicker" layoutX="683.0" layoutY="51.0" prefHeight="11.0" prefWidth="127.0" promptText="To" />
-      <Button fx:id="dateFilterButton" layoutX="817.0" layoutY="48.0" mnemonicParsing="false" text="OK" />
       <ChoiceBox fx:id="filterPicker" layoutX="426.0" layoutY="49.0" prefHeight="26.0" prefWidth="87.0" />
     </children>
 </Pane>
