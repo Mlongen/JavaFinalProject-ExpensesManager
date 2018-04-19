@@ -8,3 +8,9 @@
  database because the data is small. After I learn MySQL I might change it.
  
  ***************************************************************************************************************************
+ 
+ Wednesday - April 19th:
+ 
+ Added: Category chooser (with add and remove category) , date filter 
+ 
+  ***************************************************************************************************************************

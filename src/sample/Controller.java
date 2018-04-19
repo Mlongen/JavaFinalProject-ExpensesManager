@@ -13,12 +13,14 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.ChoiceBox;
 import java.io.*;
 import java.net.URL;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Controller implements Initializable{
+
 
 
     private Database database;
@@ -32,6 +34,10 @@ public class Controller implements Initializable{
     private TableColumn<Entry, String> category;
     @FXML
     private Button deleteButton;
+
+    @FXML
+    private Label monthLabel;
+
     @FXML
     private ChoiceBox monthPicker;
 
@@ -52,6 +58,23 @@ public class Controller implements Initializable{
 
     @FXML
     private DatePicker datePicker;
+
+    @FXML
+    private DatePicker fromDatePicker;
+
+    @FXML
+    private DatePicker toDatePicker;
+
+    @FXML
+    private Button dateFilterButton;
+
+    @FXML
+    private ChoiceBox filterPicker;
+
+
+    private long fromMillis;
+
+    private long toMillis;
 
 
     public ObservableList<Entry> list = FXCollections.observableArrayList();
@@ -125,7 +148,7 @@ public class Controller implements Initializable{
 
         // Setting choiceBox Items
         monthPicker.setItems(FXCollections.observableArrayList(
-                 "All", "Past 30 days", "Past 90 days", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+                  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
         );
 
 
@@ -206,6 +229,99 @@ public class Controller implements Initializable{
             }
 
         });
+
+
+
+
+        //SETTING UP DATE PICKERS AND FILTERS
+
+        fromMillis = 0;
+        toMillis = 0;
+
+        fromDatePicker.setOnAction(e -> {
+            String fromValue = fromDatePicker.getValue().toString();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date fromDate = null;
+            try {
+                fromDate = sdf.parse(fromValue);
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
+            fromMillis = fromDate.getTime();
+            System.out.println(fromMillis);
+
+                }
+        );
+
+        toDatePicker.setOnAction(e -> {
+            String fromValue = toDatePicker.getValue().toString();
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+            Date fromDate = null;
+            try {
+                fromDate = sdf2.parse(fromValue);
+            } catch (ParseException e1) {
+                e1.printStackTrace();
+            }
+            toMillis = fromDate.getTime();
+            System.out.println(toMillis);
+
+                }
+        );
+
+        dateFilterButton.setOnAction(e -> {
+            filteredList.remove(0, filteredList.size());
+            for (int i = 0; i < list.size(); i++) {
+
+                long thisMillis = 0;
+                String objectValue = list.get(i).getYear() + "-" + list.get(i).getMonth() + "-" + list.get(i).getDay();
+                SimpleDateFormat x = new SimpleDateFormat("yyyy-MM-dd");
+                Date thisDate = null;
+                try {
+                    thisDate = x.parse(objectValue);
+                } catch (ParseException e1) {
+                    e1.printStackTrace();
+                }
+                thisMillis = thisDate.getTime();
+                if (thisMillis > fromMillis && thisMillis <= toMillis) {
+                    filteredList.add(list.get(i));
+
+                }
+                else {
+                    // ... user chose CANCEL or closed the dialog
+                }
+
+            }
+        });
+
+        filterPicker.setItems(FXCollections.observableArrayList(
+                "Period", "Month")
+        );
+
+        monthPicker.setVisible(false);
+        monthLabel.setVisible(false);
+        fromDatePicker.setVisible(false);
+        toDatePicker.setVisible(false);
+        dateFilterButton.setVisible(false);
+
+        filterPicker.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
+                if (newValue == "Period") {
+                    monthPicker.setVisible(false);
+                    monthLabel.setVisible(false);
+                    fromDatePicker.setVisible(true);
+                    toDatePicker.setVisible(true);
+                    dateFilterButton.setVisible(true);
+
+
+                }
+                if (newValue == "Month") {
+                    monthPicker.setVisible(true);
+                    monthLabel.setVisible(true);
+                    fromDatePicker.setVisible(false);
+                    toDatePicker.setVisible(false);
+                    dateFilterButton.setVisible(false);
+
+                }}
+            );
 
 
 

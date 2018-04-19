@@ -16,9 +16,9 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1200.0" style="-fx-background-image: url('file:bg.jpg');" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-image: url('file:bg.jpg');" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
     <children>
-        <TableView fx:id="table" layoutX="393.0" layoutY="80.0" prefHeight="500.0" prefWidth="400.0">
+        <TableView fx:id="table" layoutX="362.0" layoutY="88.0" prefHeight="500.0" prefWidth="454.0">
             <columns>
                 <TableColumn fx:id="description" prefWidth="144.0" style="-fx-alignment: CENTER;" text="Description">
                     <cellValueFactory><PropertyValueFactory property="description" />
@@ -34,10 +34,10 @@
                 </TableColumn>
             </columns>
         </TableView>
-      <Button fx:id="deleteButton" layoutX="725.0" layoutY="614.0" mnemonicParsing="false" text="Remove">
+      <Button fx:id="deleteButton" layoutX="735.0" layoutY="597.0" mnemonicParsing="false" text="Remove">
          </Button>
-      <ChoiceBox fx:id="monthPicker" layoutX="695.0" layoutY="38.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="6.0" prefWidth="97.0" />
-      <Label layoutX="643.0" layoutY="43.0" prefHeight="17.0" prefWidth="50.0" text="Month:" />
+      <ChoiceBox fx:id="monthPicker" layoutX="713.0" layoutY="49.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="6.0" prefWidth="97.0" />
+      <Label fx:id="monthLabel" layoutX="646.0" layoutY="55.0" prefHeight="17.0" prefWidth="50.0" text="Month:" />
       <Label layoutX="87.0" layoutY="76.0" prefHeight="38.0" prefWidth="196.0" text="New entry">
          <font>
             <Font size="31.0" />
@@ -58,8 +58,8 @@
          </font>
       </TextField>
       <Label layoutX="86.0" layoutY="360.0" text="Category" />
-      <PieChart fx:id="piechart" layoutX="799.0" layoutY="178.0" prefHeight="325.0" prefWidth="400.0" />
-      <Label layoutX="826.0" layoutY="71.0" prefHeight="38.0" prefWidth="196.0" text="Details">
+      <PieChart fx:id="piechart" layoutX="878.0" layoutY="178.0" prefHeight="325.0" prefWidth="400.0" />
+      <Label layoutX="886.0" layoutY="71.0" prefHeight="38.0" prefWidth="196.0" text="Details">
          <font>
             <Font size="31.0" />
          </font>
@@ -74,10 +74,10 @@
             <Font size="18.0" />
          </font>
       </RadioButton>
-      <Button layoutX="855.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="158.0" text="Details per month" />
-      <Button layoutX="1014.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="158.0" text="Details per category" />
-      <Label layoutX="493.0" layoutY="577.0" prefHeight="31.0" prefWidth="40.0" text="Sum:" />
-      <Label layoutX="593.0" layoutY="583.0" text="\$1000.00" />
+      <Button layoutX="913.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="158.0" text="Details per month" />
+      <Button layoutX="1072.0" layoutY="138.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="158.0" text="Details per category" />
+      <Label layoutX="493.0" layoutY="590.0" prefHeight="31.0" prefWidth="40.0" text="Sum:" />
+      <Label layoutX="593.0" layoutY="595.0" text="\$1000.00" />
       <MenuBar layoutX="1.0" prefHeight="21.0" prefWidth="1199.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
@@ -109,10 +109,16 @@
          </font>
       </Button>
       <TextField fx:id="categoryAdder" layoutX="85.0" layoutY="390.0" prefHeight="26.0" prefWidth="150.0" />
-      <Button  fx:id="categoryOK" layoutX="239.0" layoutY="393.0" mnemonicParsing="false" text="OK">
+      <Button fx:id="categoryOK" layoutX="239.0" layoutY="393.0" mnemonicParsing="false" text="OK">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
+      <Label layoutX="365.0" layoutY="54.0" prefHeight="18.0" prefWidth="65.0" text="Filter by:" />
+      <Label layoutX="277.0" layoutY="137.0" prefHeight="17.0" prefWidth="50.0" text="from:" />
+      <DatePicker fx:id="fromDatePicker" layoutX="546.0" layoutY="50.0" prefHeight="18.0" prefWidth="115.0" promptText="From" />
+      <DatePicker fx:id="toDatePicker" layoutX="683.0" layoutY="51.0" prefHeight="11.0" prefWidth="127.0" promptText="To" />
+      <Button fx:id="dateFilterButton" layoutX="817.0" layoutY="48.0" mnemonicParsing="false" text="OK" />
+      <ChoiceBox fx:id="filterPicker" layoutX="426.0" layoutY="49.0" prefHeight="26.0" prefWidth="87.0" />
     </children>
 </Pane>
