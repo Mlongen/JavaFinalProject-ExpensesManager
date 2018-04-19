@@ -14,3 +14,5 @@
  Added: Category chooser (with add and remove category) , date filter 
  
   ***************************************************************************************************************************
+
+Thursday - April 20th

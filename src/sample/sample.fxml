@@ -130,25 +130,27 @@
       <Label layoutX="54.0" layoutY="393.0" prefHeight="18.0" prefWidth="113.0" text="Choose category:" />
       <ChoiceBox fx:id="budgetCategoryChooser" layoutX="52.0" layoutY="414.0" prefHeight="28.0" prefWidth="134.0" />
       <Label layoutX="56.0" layoutY="452.0" prefHeight="18.0" prefWidth="113.0" text="Value:" />
-      <TextField layoutX="52.0" layoutY="471.0" prefHeight="26.0" prefWidth="134.0" />
+      <TextField fx:id="budgetValueTextField" layoutX="52.0" layoutY="471.0" prefHeight="26.0" prefWidth="134.0" />
       <Line endX="300.0" layoutX="130.0" layoutY="330.0" startX="-120.0" />
-      <TableView layoutX="225.0" layoutY="413.0" prefHeight="200.0" prefWidth="200.0">
-        <columns>
-          <TableColumn prefWidth="102.86582946777344" text="Category" />
-          <TableColumn prefWidth="47.1341552734375" text="Budget" />
-        </columns>
-      </TableView>
+
       <Label layoutX="226.0" layoutY="394.0" text="Current budgets:" />
 
 
 
 
-        <!--BUDGET BUTTONS-->
+        <!--BUDGET STUFF-->
 
-      <Button fx:id="addBudget"  layoutX="305.0" layoutY="613.0" mnemonicParsing="false" text="Add" />
-      <Button fx:id="removeBudget"   layoutX="362.0" layoutY="613.0" mnemonicParsing="false" text="Remove" />
+        <TableView fx:id="budgetTable" layoutX="225.0" layoutY="413.0" prefHeight="200.0" prefWidth="200.0">
+            <columns>
+                <TableColumn fx:id="budgetCategory" prefWidth="74.0" text="Category" />
+                <TableColumn fx:id="budgetValue" prefWidth="57.5" text="Budget" />
+                <TableColumn fx:id="percentage" prefWidth="94.0" text="Alarm %" />
+            </columns>
+        </TableView>
+      <Button fx:id="addBudget" layoutX="305.0" layoutY="613.0" mnemonicParsing="false" text="Add" />
+      <Button fx:id="removeBudget" layoutX="362.0" layoutY="613.0" mnemonicParsing="false" text="Remove" />
       <Label layoutX="56.0" layoutY="514.0" text="Alarm when:" />
-      <Slider layoutX="54.0" layoutY="535.0" prefHeight="24.0" prefWidth="124.0" showTickLabels="true" snapToTicks="true" value="50.0" />
+      <Slider fx:id="alarmPercentageSlider" layoutX="54.0" layoutY="535.0" prefHeight="24.0" prefWidth="124.0" showTickLabels="true" snapToTicks="true" value="50.0" />
       <Label layoutX="177.0" layoutY="562.0" text="\%" />
 
         <!-- end -->

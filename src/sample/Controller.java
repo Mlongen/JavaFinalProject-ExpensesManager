@@ -1,21 +1,22 @@
-package sample;
 
-import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.chart.*;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.ChoiceBox;
-import java.io.*;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+        package sample;
+
+        import javafx.beans.property.ReadOnlyStringWrapper;
+        import javafx.collections.FXCollections;
+        import javafx.collections.ObservableList;
+        import javafx.fxml.FXML;
+        import javafx.fxml.Initializable;
+        import javafx.scene.chart.*;
+        import javafx.scene.control.*;
+        import javafx.scene.control.cell.PropertyValueFactory;
+        import javafx.scene.control.ChoiceBox;
+        import java.io.*;
+        import java.net.URL;
+        import java.text.ParseException;
+        import java.text.SimpleDateFormat;
+        import java.time.LocalDate;
+        import java.time.format.DateTimeFormatter;
+        import java.util.*;
 
 public class Controller implements Initializable{
 
@@ -26,6 +27,7 @@ public class Controller implements Initializable{
     private TableView<Entry> table;
     @FXML
     private TableColumn<Entry, String> description;
+
     @FXML
     private TableColumn<Entry, Double> value;
 
@@ -92,7 +94,7 @@ public class Controller implements Initializable{
     private ChoiceBox filterPicker;
 
 
-    //BUDGET STUFF
+    //BUDGET STUFF---------------------------------------
 
     @FXML
     private Button addBudget;
@@ -102,6 +104,26 @@ public class Controller implements Initializable{
 
     @FXML
     private ChoiceBox budgetCategoryChooser;
+
+    @FXML
+    private TableView budgetTable;
+
+    @FXML
+    private TableColumn<Budget, String> budgetCategory;
+
+    @FXML
+    private TableColumn<Budget, Double> budgetValue;
+
+    @FXML
+    private TableColumn<Budget, Integer> percentage;
+
+    @FXML
+    private Slider alarmPercentageSlider;
+
+    @FXML
+    private TextField budgetValueTextField;
+
+    //-----------------------------------------------------
 
 
 
@@ -119,6 +141,9 @@ public class Controller implements Initializable{
     public ObservableList<Entry> filteredList = FXCollections.observableArrayList();
 
     ObservableList<String> categoryList = FXCollections.observableArrayList();
+
+    ObservableList<Budget> budgetList = FXCollections.observableArrayList();
+
 
 
     @FXML
@@ -224,25 +249,40 @@ public class Controller implements Initializable{
         });
 
 
-
-        //populating columns
+        //----------------------------------------------------------------------
+        //
+        //              POPULATING TABLE COLUMNS
+        //
+        //----------------------------------------------------------------------
+        //
+        //              POPULATING MAIN TABLE
+        //----------------------------------------------------------------------
         description.setCellValueFactory(new PropertyValueFactory<Entry, String>("description"));
         value.setCellValueFactory(new PropertyValueFactory<Entry, Double>("value"));
         category.setCellValueFactory(new PropertyValueFactory<Entry, String>("category"));
         date.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(String.valueOf(cellData.getValue().getDay() + "/" +cellData.getValue().getMonth())));
         table.setItems(filteredList);
+        //----------------------------------------------------------------------
+        //
+        //              POPULATING BUDGET TABLE
+        //-----------------------------------------------------------------------
+
+
+
+
+
+
         //listening for changes
 
         // Setting choiceBox Items
         monthPicker.setItems(FXCollections.observableArrayList(
-                  "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+                "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
         );
 
 
         //category manager
         categoryOK.setVisible(false);
         categoryAdder.setVisible(false);
-        categoryList = FXCollections.observableArrayList();
         Scanner inputcategory = null;
         try {
             inputcategory = new Scanner(new File("category.txt"));
@@ -266,11 +306,11 @@ public class Controller implements Initializable{
             categoryAdder.setVisible(false);
             categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
 
-           String[] categories = new String[categoryList.size()];
-           for (int i = 0; i < categoryList.size();i++) {
-               categories[i] = categoryList.get(i).toString();
-           }
-           String categoriesoutput = String.join(";", categories);
+            String[] categories = new String[categoryList.size()];
+            for (int i = 0; i < categoryList.size();i++) {
+                categories[i] = categoryList.get(i).toString();
+            }
+            String categoriesoutput = String.join(";", categories);
             try (PrintWriter out = new PrintWriter(new FileWriter("category.txt", false))) {
                 out.println(categoriesoutput);
             } catch (IOException z) {
@@ -337,56 +377,56 @@ public class Controller implements Initializable{
         toMillis = 0;
 
         fromDatePicker.setOnAction(e -> {
-            String fromValue = fromDatePicker.getValue().toString();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date fromDate = null;
-            try {
-                fromDate = sdf.parse(fromValue);
-            } catch (ParseException e1) {
-                e1.printStackTrace();
-            }
-            fromMillis = fromDate.getTime();
-            System.out.println(fromMillis);
+                    String fromValue = fromDatePicker.getValue().toString();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date fromDate = null;
+                    try {
+                        fromDate = sdf.parse(fromValue);
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                    fromMillis = fromDate.getTime();
+                    System.out.println(fromMillis);
 
                 }
         );
 
         toDatePicker.setOnAction(e -> {
 
-            //GETTING THE DATE
-            String fromValue = toDatePicker.getValue().toString();
-            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-            Date fromDate = null;
-            try {
-                fromDate = sdf2.parse(fromValue);
-            } catch (ParseException e1) {
-                e1.printStackTrace();
-            }
-            toMillis = fromDate.getTime();
+                    //GETTING THE DATE
+                    String fromValue = toDatePicker.getValue().toString();
+                    SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+                    Date fromDate = null;
+                    try {
+                        fromDate = sdf2.parse(fromValue);
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                    toMillis = fromDate.getTime();
 
-            // POPULATING THE FILTEREDLIST
-            filteredList.remove(0, filteredList.size());
-            for (int i = 0; i < list.size(); i++) {
+                    // POPULATING THE FILTEREDLIST
+                    filteredList.remove(0, filteredList.size());
+                    for (int i = 0; i < list.size(); i++) {
 
-                long thisMillis = 0;
-                String objectValue = list.get(i).getYear() + "-" + list.get(i).getMonth() + "-" + list.get(i).getDay();
-                SimpleDateFormat x = new SimpleDateFormat("yyyy-MM-dd");
-                Date thisDate = null;
-                try {
-                    thisDate = x.parse(objectValue);
-                } catch (ParseException e1) {
-                    e1.printStackTrace();
-                }
-                thisMillis = thisDate.getTime();
-                if (thisMillis > fromMillis && thisMillis <= toMillis) {
-                    filteredList.add(list.get(i));
+                        long thisMillis = 0;
+                        String objectValue = list.get(i).getYear() + "-" + list.get(i).getMonth() + "-" + list.get(i).getDay();
+                        SimpleDateFormat x = new SimpleDateFormat("yyyy-MM-dd");
+                        Date thisDate = null;
+                        try {
+                            thisDate = x.parse(objectValue);
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
+                        thisMillis = thisDate.getTime();
+                        if (thisMillis > fromMillis && thisMillis <= toMillis) {
+                            filteredList.add(list.get(i));
 
-                }
-                else {
-                    // ... user chose CANCEL or closed the dialog
-                }
+                        }
+                        else {
+                            // ... user chose CANCEL or closed the dialog
+                        }
 
-            }
+                    }
 
                 }
         );
@@ -401,22 +441,22 @@ public class Controller implements Initializable{
         toDatePicker.setVisible(false);
 
         filterPicker.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
-                if (newValue == "Period") {
-                    monthPicker.setVisible(false);
-                    monthLabel.setVisible(false);
-                    fromDatePicker.setVisible(true);
-                    toDatePicker.setVisible(true);
+            if (newValue == "Period") {
+                monthPicker.setVisible(false);
+                monthLabel.setVisible(false);
+                fromDatePicker.setVisible(true);
+                toDatePicker.setVisible(true);
 
 
-                }
-                if (newValue == "Month") {
-                    monthPicker.setVisible(true);
-                    monthLabel.setVisible(true);
-                    fromDatePicker.setVisible(false);
-                    toDatePicker.setVisible(false);
+            }
+            if (newValue == "Month") {
+                monthPicker.setVisible(true);
+                monthLabel.setVisible(true);
+                fromDatePicker.setVisible(false);
+                toDatePicker.setVisible(false);
 
-                }}
-            );
+            }}
+        );
 
 
 
@@ -681,6 +721,127 @@ public class Controller implements Initializable{
             }
 
         }
+
+        //---------------------------------------------------------------------------------
+        //
+        //
+        //            BUDGET MANAGER
+        //
+        //
+        //---------------------------------------------------------------------------------
+
+
+        //----------------------------------------------------------------------------------
+        //READING BUDGET FILE
+        //----------------------------------------------------------------------------------
+
+        budgetList= FXCollections.observableArrayList();
+        Scanner inputbudget = null;
+        try {
+            inputbudget = new Scanner(new File("budget.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String readbudget = inputbudget.nextLine();
+        String[] splittedbudget = readbudget.split(";");
+
+
+        //----------------------------------------------------------------------------------
+        //CREATING OBJECTS AND ADDING TO BUDGETLIST
+        //----------------------------------------------------------------------------------
+
+        for (int i = 0; i < splittedbudget.length;i += 3) {
+            Budget a = new Budget (String.valueOf(splittedbudget[i]), Double.valueOf(splittedbudget[i+1]), Integer.valueOf(splittedbudget[i+2]));
+            budgetList.add(a);
+        }
+
+        //---------------------------------------------------------------------------------
+        // POPULATING TABLEVIEW
+        // -------------------------------------------------------------------------------
+        budgetCategory.setCellValueFactory(new PropertyValueFactory<Budget, String>("budgetCategory"));
+        budgetValue.setCellValueFactory(new PropertyValueFactory<Budget, Double>("budgetValue"));
+        percentage.setCellValueFactory(new PropertyValueFactory<Budget, Integer>("percentage"));
+        budgetTable.setItems(budgetList);
+
+        budgetCategoryChooser.setItems(FXCollections.observableArrayList(categoryList));
+
+        //---------------------------------------------------------------------------------
+        //ADDING TO BUDGETLIST
+        //---------------------------------------------------------------------------------
+
+        addBudget.setOnAction((e -> {
+
+            String chosenBudgetCategory = budgetCategoryChooser.getSelectionModel().getSelectedItem().toString();
+            Double chosenBudgetValue = Double.valueOf(budgetValueTextField.getText());
+            Integer chosenAlarmPercentage = (int)alarmPercentageSlider.getValue();
+
+            Budget newBudget = new Budget(chosenBudgetCategory, chosenBudgetValue, chosenAlarmPercentage);
+
+            budgetList.add(newBudget);
+         //-------------------------------------------------------------------------------
+         //
+         // EXPORTING TO TXT
+         //-------------------------------------------------------------------------------
+
+            List<String> formattingString = new ArrayList<>();
+            for (int i = 0; i < budgetList.size();i++) {
+                formattingString.add(budgetList.get(i).getCategory() + ";" + budgetList.get(i).getValue() + ";" + budgetList.get(i).getPercentage());
+            }
+            String formattedString = String.join(";", formattingString);
+
+            try (PrintWriter out = new PrintWriter(new FileWriter("budget.txt", false))) {
+                out.println(formattedString);
+            } catch (IOException z) {
+                z.printStackTrace();
+            }
+
+        }));
+
+        //---------------------------------------------------------------------------------
+        //
+        //  REMOVE BUTTON
+        //---------------------------------------------------------------------------------
+
+        removeBudget.setOnAction((e -> {
+            Object selectedItem = budgetTable.getSelectionModel().getSelectedItem();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation");
+            alert.setContentText("Are you sure you want to delete this item?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+
+                //removes the item selected
+                budgetTable.getItems().remove(selectedItem);
+                budgetList.remove(selectedItem);
+            }
+            else {
+            }
+
+            List<String> formattingString = new ArrayList<>();
+            for (int i = 0; i < budgetList.size();i++) {
+                formattingString.add(budgetList.get(i).getCategory() + ";" + budgetList.get(i).getValue() + ";" + budgetList.get(i).getPercentage());
+            }
+            String formattedString = String.join(";", formattingString);
+
+            try (PrintWriter out = new PrintWriter(new FileWriter("budget.txt", false))) {
+                out.println(formattedString);
+            } catch (IOException z) {
+                z.printStackTrace();
+            }
+
+
+        }));
+
+
+
+
+
+
+        //---------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------
 
 
 
