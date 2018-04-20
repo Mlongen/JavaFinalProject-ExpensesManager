@@ -180,6 +180,7 @@ public class Controller implements Initializable{
 
     @FXML
     private CategoryAxis xAxis;
+    private String de;
 
 
     @Override
@@ -223,7 +224,7 @@ public class Controller implements Initializable{
             double value = Double.valueOf(valueTextField.getText());
             int year = Integer.valueOf(datePicker.getValue().toString().substring(0, 4));
             int month = Integer.valueOf(datePicker.getValue().toString().substring(5, 7));
-            int day = Integer.valueOf(datePicker.getValue().toString().substring(9, 10));
+            int day = Integer.valueOf(datePicker.getValue().toString().substring(8, 10));
             String category = categoryPicker.getSelectionModel().getSelectedItem().toString();
 
             Entry newEntry = new Entry(description, value, day, month, year, category);
@@ -260,7 +261,7 @@ public class Controller implements Initializable{
         description.setCellValueFactory(new PropertyValueFactory<Entry, String>("description"));
         value.setCellValueFactory(new PropertyValueFactory<Entry, Double>("value"));
         category.setCellValueFactory(new PropertyValueFactory<Entry, String>("category"));
-        date.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(String.valueOf(cellData.getValue().getDay() + "/" +cellData.getValue().getMonth())));
+        date.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(String.valueOf(cellData.getValue().getMonth() + "/" +cellData.getValue().getDay())));
         table.setItems(filteredList);
         //----------------------------------------------------------------------
         //
@@ -616,10 +617,10 @@ public class Controller implements Initializable{
         LocalDate localDate = LocalDate.parse(date , formatter);
         datePicker.setValue(localDate);
 
-
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         //delete button action
         deleteButton.setOnAction(e -> {
-            Entry selectedItem = table.getSelectionModel().getSelectedItem();
+
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Entry removal");
             alert.setContentText("Are you sure you want to delete this entry?");
@@ -628,9 +629,8 @@ public class Controller implements Initializable{
             if (result.get() == ButtonType.OK){
 
                 //removes the item selected
-                table.getItems().remove(selectedItem);
-                list.remove(selectedItem);
-                chartUpdater();
+                list.removeAll(table.getSelectionModel().getSelectedItems());
+                table.getItems().removeAll(table.getSelectionModel().getSelectedItems());
 
                 //creates a formatted string for the output
 
@@ -742,8 +742,8 @@ public class Controller implements Initializable{
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        String readbudget = inputbudget.nextLine();
-        String[] splittedbudget = readbudget.split(";");
+        String de = inputbudget.nextLine();
+        String[] splittedbudget = de.split(";");
 
 
         //----------------------------------------------------------------------------------
