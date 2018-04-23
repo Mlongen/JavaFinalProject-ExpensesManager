@@ -1,1 +1,1 @@
-Utilities;340.0;81;beer;400.0;75;beer;400.0;75
+Testing;300;70;

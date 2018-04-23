@@ -74,8 +74,8 @@
             <Font size="18.0" />
          </font>
       </RadioButton>
-      <Button layoutX="969.0" layoutY="86.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="270.0" text="Details per month" />
-      <Button layoutX="1246.0" layoutY="85.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="274.0" text="Details per category" />
+      <Button  fx:id="monthChartButton" layoutX="969.0" layoutY="86.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="270.0" text="Details per month" />
+      <Button fx:id="categoryChartButton" layoutX="1246.0" layoutY="85.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="274.0" text="Details per category" />
       <Label layoutX="548.0" layoutY="638.0" prefHeight="31.0" prefWidth="40.0" text="Sum:" />
       <Label layoutX="601.0" layoutY="644.0" text="\$1000.00" />
       <MenuBar layoutX="1.0" prefHeight="21.0" prefWidth="1199.0">

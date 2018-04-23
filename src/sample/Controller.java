@@ -145,6 +145,13 @@ public class Controller implements Initializable{
     ObservableList<Budget> budgetList = FXCollections.observableArrayList();
 
 
+    // CHART STUFF
+
+    @FXML
+    private Button categoryChartButton;
+
+    @FXML
+    private Button monthChartButton;
 
     @FXML
     private PieChart piechart;
@@ -620,7 +627,6 @@ public class Controller implements Initializable{
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         //delete button action
         deleteButton.setOnAction(e -> {
-
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Entry removal");
             alert.setContentText("Are you sure you want to delete this entry?");
@@ -628,7 +634,7 @@ public class Controller implements Initializable{
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK){
 
-                //removes the item selected
+                //removes the items selected
                 list.removeAll(table.getSelectionModel().getSelectedItems());
                 table.getItems().removeAll(table.getSelectionModel().getSelectedItems());
 
@@ -650,9 +656,7 @@ public class Controller implements Initializable{
                 }
 
             }
-            else {
-                // ... user chose CANCEL or closed the dialog
-            }
+            categoryChartUpdater();
 
         });
 
@@ -802,6 +806,7 @@ public class Controller implements Initializable{
         //  REMOVE BUTTON
         //---------------------------------------------------------------------------------
 
+        budgetTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         removeBudget.setOnAction((e -> {
             Object selectedItem = budgetTable.getSelectionModel().getSelectedItem();
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -845,7 +850,40 @@ public class Controller implements Initializable{
 
 
 
+
+
+
         //PIE CHART
+
+        categoryChartButton.setOnAction(e -> {
+            categoryChartUpdater();
+
+
+        });
+
+        monthChartButton.setOnAction(e -> {
+            piechart.getData().clear();
+
+            ObservableList<PieChart.Data> pieChartData =
+                    FXCollections.observableArrayList(
+                            new PieChart.Data("January: $" + januaryTotal, januaryTotal),
+                            new PieChart.Data("February: $" + februaryTotal, februaryTotal),
+                            new PieChart.Data("March: $" + marchTotal, marchTotal),
+                            new PieChart.Data("April: $" + aprilTotal, aprilTotal),
+                            new PieChart.Data("May: $" + mayTotal, mayTotal),
+                            new PieChart.Data("June: $" + juneTotal, juneTotal),
+                            new PieChart.Data("July: $" + julyTotal, julyTotal),
+                            new PieChart.Data("August: $" + augustTotal, augustTotal),
+                            new PieChart.Data("September: $" + septemberTotal, septemberTotal),
+                            new PieChart.Data("October: $" + octoberTotal, octoberTotal),
+                            new PieChart.Data("November: $" + novemberTotal, novemberTotal),
+                            new PieChart.Data("December: $" + decemberTotal, decemberTotal));
+
+
+            piechart.setTitle("Monthly analysis");
+            piechart.setData(pieChartData);
+
+        });
 
         ObservableList<PieChart.Data> pieChartData =
                 FXCollections.observableArrayList(
@@ -904,7 +942,25 @@ public class Controller implements Initializable{
 
     }
 
+    private void categoryChartUpdater() {
+        //clearing previous data
+        piechart.getData().clear();
 
+        //populating data
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        for (int i = 0; i <  categoryList.size();i++) {
+            double categoryTotal = 0;
+            for (int j = 0; j < filteredList.size();j++) {
+                if (filteredList.get(j).getCategory().equals(categoryList.get(i))) {
+                    categoryTotal += filteredList.get(j).getValue();
+                }
+            }
+           pieChartData.add(new PieChart.Data(categoryList.get(i) + ": " + categoryTotal, categoryTotal));
+        }
+
+        piechart.setTitle("Details per category:");
+        piechart.setData(pieChartData);
+    }
 
 
 }
