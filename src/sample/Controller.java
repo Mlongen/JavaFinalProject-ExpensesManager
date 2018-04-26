@@ -10,6 +10,7 @@
         import javafx.scene.control.*;
         import javafx.scene.control.cell.PropertyValueFactory;
         import javafx.scene.control.ChoiceBox;
+
         import java.io.*;
         import java.net.URL;
         import java.text.ParseException;
@@ -20,7 +21,8 @@
 
 public class Controller implements Initializable{
 
-
+    @FXML
+    private Label sumLabel;
 
     private Database database;
     @FXML
@@ -115,7 +117,7 @@ public class Controller implements Initializable{
     private TableColumn<Budget, Double> budgetValue;
 
     @FXML
-    private TableColumn<Budget, Integer> percentage;
+    private TableColumn<Budget, Integer> budgetPercentage;
 
     @FXML
     private Slider alarmPercentageSlider;
@@ -136,22 +138,22 @@ public class Controller implements Initializable{
     private long toMillis;
 
 
-    public ObservableList<Entry> list = FXCollections.observableArrayList();
+    private ObservableList<Entry> rawEntryList;
 
-    public ObservableList<Entry> filteredList = FXCollections.observableArrayList();
+    private ObservableList<Entry> displayedEntryList = FXCollections.observableArrayList();
 
-    ObservableList<String> categoryList = FXCollections.observableArrayList();
+    private ObservableList<String> categoryList = FXCollections.observableArrayList();
 
-    ObservableList<Budget> budgetList = FXCollections.observableArrayList();
+    private ObservableList<Budget> budgetList = FXCollections.observableArrayList();
 
 
     // CHART STUFF
 
     @FXML
-    private Button categoryChartButton;
+    private ToggleButton displayCategoryChartButton;
 
     @FXML
-    private Button monthChartButton;
+    private ToggleButton monthChartButton;
 
     @FXML
     private PieChart piechart;
@@ -192,35 +194,7 @@ public class Controller implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-
-        // READING FILES
-        Scanner inputdb = null;
-        try {
-            inputdb = new Scanner(new File("database.txt"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-
-
-
-        //reading database file
-        String readdb = inputdb.nextLine();
-        //reading category file
-
-
-
-
-
-        // creating new database object
-        Database db = new Database();
-        //populating database with scanner read
-        db.readAndCreateArray(readdb);
-        //creating observablelist to display tables
-        list = FXCollections.observableArrayList(db.getObjects());
-        filteredList.addAll(list);
-
+        createDB();
 
 
         //adding new entry
@@ -235,14 +209,20 @@ public class Controller implements Initializable{
             String category = categoryPicker.getSelectionModel().getSelectedItem().toString();
 
             Entry newEntry = new Entry(description, value, day, month, year, category);
-            list.add(newEntry);
-            filteredList.add(newEntry);
+            rawEntryList.add(newEntry);
+            displayedEntryList.add(newEntry);
             chartUpdater();
 
+            //CLEARING PICKERS
+            descriptionTextField.clear();
+            datePicker.setValue(null);
+            categoryPicker.setValue(null);
+            valueTextField.clear();
+            //-----------------------
             List<String> formattingString = new ArrayList<>();
-            for (int i = 0; i < list.size();i++) {
-                formattingString.add(list.get(i).getDescription() + ";" + list.get(i).getValue() + ";" + list.get(i).getDay() + ";" +
-                        list.get(i).getMonth() + ";" + list.get(i).getYear() + ";" + list.get(i).getCategory());
+            for (int i = 0; i < rawEntryList.size(); i++) {
+                formattingString.add(rawEntryList.get(i).getDescription() + ";" + rawEntryList.get(i).getValue() + ";" + rawEntryList.get(i).getDay() + ";" +
+                        rawEntryList.get(i).getMonth() + ";" + rawEntryList.get(i).getYear() + ";" + rawEntryList.get(i).getCategory());
             }
             String formattedString = String.join(";", formattingString);
 
@@ -269,7 +249,7 @@ public class Controller implements Initializable{
         value.setCellValueFactory(new PropertyValueFactory<Entry, Double>("value"));
         category.setCellValueFactory(new PropertyValueFactory<Entry, String>("category"));
         date.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(String.valueOf(cellData.getValue().getMonth() + "/" +cellData.getValue().getDay())));
-        table.setItems(filteredList);
+        table.setItems(displayedEntryList);
         //----------------------------------------------------------------------
         //
         //              POPULATING BUDGET TABLE
@@ -277,30 +257,27 @@ public class Controller implements Initializable{
 
 
 
-
-
-
         //listening for changes
 
         // Setting choiceBox Items
         monthPicker.setItems(FXCollections.observableArrayList(
-                "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+                "All", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
         );
 
 
         //category manager
         categoryOK.setVisible(false);
         categoryAdder.setVisible(false);
-        Scanner inputcategory = null;
-        try {
-            inputcategory = new Scanner(new File("category.txt"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        String readcategory = inputcategory.nextLine();
-        String[] splittedcategory = readcategory.split(";");
-        categoryList.addAll(splittedcategory);
-        categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
+//        Scanner inputcategory = null;
+//        try {
+//            inputcategory = new Scanner(new File("category.txt"));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        String readcategory = inputcategory.nextLine();
+//        String[] splittedcategory = readcategory.split(";");
+//        categoryList.addAll(splittedcategory);
+//        categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
 
         addCategory.pressedProperty().addListener((o, old, newValue) ->
                 categoryAdder.setVisible(true));
@@ -413,11 +390,11 @@ public class Controller implements Initializable{
                     toMillis = fromDate.getTime();
 
                     // POPULATING THE FILTEREDLIST
-                    filteredList.remove(0, filteredList.size());
-                    for (int i = 0; i < list.size(); i++) {
+                    displayedEntryList.remove(0, displayedEntryList.size());
+                    for (int i = 0; i < rawEntryList.size(); i++) {
 
                         long thisMillis = 0;
-                        String objectValue = list.get(i).getYear() + "-" + list.get(i).getMonth() + "-" + list.get(i).getDay();
+                        String objectValue = rawEntryList.get(i).getYear() + "-" + rawEntryList.get(i).getMonth() + "-" + rawEntryList.get(i).getDay();
                         SimpleDateFormat x = new SimpleDateFormat("yyyy-MM-dd");
                         Date thisDate = null;
                         try {
@@ -427,7 +404,7 @@ public class Controller implements Initializable{
                         }
                         thisMillis = thisDate.getTime();
                         if (thisMillis > fromMillis && thisMillis <= toMillis) {
-                            filteredList.add(list.get(i));
+                            displayedEntryList.add(rawEntryList.get(i));
 
                         }
                         else {
@@ -471,16 +448,16 @@ public class Controller implements Initializable{
         monthPicker.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
 
                     if (newValue == "All") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
 
                     }
                     else if (newValue == "January") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 1) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 1) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
@@ -488,11 +465,11 @@ public class Controller implements Initializable{
 
                     }
                     else if (newValue == "February") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 2) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 2) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
@@ -500,115 +477,116 @@ public class Controller implements Initializable{
 
                     }
                     else if (newValue == "March") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 3) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 3) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
                     else if (newValue == "April") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 4) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 4) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
                     else if (newValue == "May") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 5) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 5) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
                     else if (newValue == "June") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 6) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 6) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
                     else if (newValue == "July") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 7) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 7) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
                     else if (newValue == "August") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 8) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 8) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
                     else if (newValue == "September") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 9) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 9) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
                     else if (newValue == "October") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 10) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 10) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
                     else if (newValue == "November") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 11) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 11) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
                     else if (newValue == "December") {
-                        filteredList.remove(0, filteredList.size());
-                        filteredList.addAll(list);
-                        for (int i = 0; i < filteredList.size();i++) {
-                            if (filteredList.get(i).getMonth() != 12) {
-                                filteredList.remove(i);
+                        displayedEntryList.remove(0, displayedEntryList.size());
+                        displayedEntryList.addAll(rawEntryList);
+                        for (int i = 0; i < displayedEntryList.size(); i++) {
+                            if (displayedEntryList.get(i).getMonth() != 12) {
+                                displayedEntryList.remove(i);
                                 i--;
                             }
 
                         }
                     }
+                    categoryChartUpdater();
                 }
         );
 
@@ -635,15 +613,15 @@ public class Controller implements Initializable{
             if (result.get() == ButtonType.OK){
 
                 //removes the items selected
-                list.removeAll(table.getSelectionModel().getSelectedItems());
+                rawEntryList.removeAll(table.getSelectionModel().getSelectedItems());
                 table.getItems().removeAll(table.getSelectionModel().getSelectedItems());
 
                 //creates a formatted string for the output
 
                 List<String> formattingString = new ArrayList<>();
-                for (int i = 0; i < list.size();i++) {
-                    formattingString.add(list.get(i).getDescription() + ";" + list.get(i).getValue() + ";" + list.get(i).getDay() + ";" +
-                            list.get(i).getMonth() + ";" + list.get(i).getYear() + ";" + list.get(i).getCategory());
+                for (int i = 0; i < rawEntryList.size(); i++) {
+                    formattingString.add(rawEntryList.get(i).getDescription() + ";" + rawEntryList.get(i).getValue() + ";" + rawEntryList.get(i).getDay() + ";" +
+                            rawEntryList.get(i).getMonth() + ";" + rawEntryList.get(i).getYear() + ";" + rawEntryList.get(i).getCategory());
                 }
                 String formattedString = String.join(";", formattingString);
 
@@ -662,6 +640,80 @@ public class Controller implements Initializable{
 
     }
 
+    public void createDB() {
+        //
+        //
+        //        READING DATABASE FILE
+        //
+        //
+
+        Scanner inputdb = null;
+        try {
+            inputdb = new Scanner(new File("database.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        //reading database file
+        String readdb = inputdb.nextLine();
+        // creating new database object
+        Database db = new Database();
+        //populating database with scanner read
+        db.readAndCreateArray(readdb);
+        //creating observablelist to display tables
+
+        //POPULATING ENTRY LIST
+        rawEntryList = FXCollections.observableArrayList(db.getEntryObjects());
+        displayedEntryList.addAll(rawEntryList);
+        inputdb.close();
+
+
+        //
+        //
+        //       READING BUDGET FILE
+        //
+
+
+        //
+        budgetList= FXCollections.observableArrayList();
+        Scanner inputbudget = null;
+        try {
+            inputbudget = new Scanner(new File("budget.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String de = inputbudget.nextLine();
+        String[] splittedbudget = de.split(";");
+
+        //----------------------------------------------------------------------------------
+        //CREATING OBJECTS AND ADDING TO BUDGETLIST
+        //----------------------------------------------------------------------------------
+
+
+        for (int i = 0; i < splittedbudget.length;i += 3) {
+            Budget a = new Budget (String.valueOf(splittedbudget[i]), Double.valueOf(splittedbudget[i+1]), Integer.valueOf(splittedbudget[i+2]));
+            budgetList.add(a);
+        }
+        inputbudget.close();
+
+        //
+        //
+        //
+        //     READING CATEGORY FILE
+        //
+        //
+
+        Scanner inputcategory = null;
+        try {
+            inputcategory = new Scanner(new File("category.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String readcategory = inputcategory.nextLine();
+        String[] splittedcategory = readcategory.split(";");
+        categoryList.addAll(splittedcategory);
+        categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
+    }
+
     private void chartUpdater() {
         januaryTotal = 0;
         februaryTotal = 0;
@@ -675,54 +727,55 @@ public class Controller implements Initializable{
         octoberTotal = 0;
         novemberTotal = 0;
         decemberTotal = 0;
-        for (int i = 0; i < list.size();i++) {
-            if (list.get(i).getMonth() == 1) {
-                januaryTotal += list.get(i).getValue();
+        for (int i = 0; i < rawEntryList.size(); i++) {
+            if (rawEntryList.get(i).getMonth() == 1) {
+                januaryTotal += rawEntryList.get(i).getValue();
             }
-            else if (list.get(i).getMonth() == 2) {
-                februaryTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 2) {
+                februaryTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 3) {
-                marchTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 3) {
+                marchTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 4) {
-                aprilTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 4) {
+                aprilTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 5) {
-                mayTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 5) {
+                mayTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 6) {
-                juneTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 6) {
+                juneTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 7) {
-                julyTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 7) {
+                julyTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 8) {
-                augustTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 8) {
+                augustTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 9) {
-                septemberTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 9) {
+                septemberTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 10) {
-                octoberTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 10) {
+                octoberTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 11) {
-                novemberTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 11) {
+                novemberTotal += rawEntryList.get(i).getValue();
 
             }
-            else if (list.get(i).getMonth() == 12) {
-                decemberTotal += list.get(i).getValue();
+            else if (rawEntryList.get(i).getMonth() == 12) {
+                decemberTotal += rawEntryList.get(i).getValue();
 
             }
+
 
         }
 
@@ -739,32 +792,32 @@ public class Controller implements Initializable{
         //READING BUDGET FILE
         //----------------------------------------------------------------------------------
 
-        budgetList= FXCollections.observableArrayList();
-        Scanner inputbudget = null;
-        try {
-            inputbudget = new Scanner(new File("budget.txt"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        String de = inputbudget.nextLine();
-        String[] splittedbudget = de.split(";");
-
-
-        //----------------------------------------------------------------------------------
-        //CREATING OBJECTS AND ADDING TO BUDGETLIST
-        //----------------------------------------------------------------------------------
-
-        for (int i = 0; i < splittedbudget.length;i += 3) {
-            Budget a = new Budget (String.valueOf(splittedbudget[i]), Double.valueOf(splittedbudget[i+1]), Integer.valueOf(splittedbudget[i+2]));
-            budgetList.add(a);
-        }
+//        budgetList= FXCollections.observableArrayList();
+//        Scanner inputbudget = null;
+//        try {
+//            inputbudget = new Scanner(new File("budget.txt"));
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        String de = inputbudget.nextLine();
+//        String[] splittedbudget = de.split(";");
+//
+//
+//        //----------------------------------------------------------------------------------
+//        //CREATING OBJECTS AND ADDING TO BUDGETLIST
+//        //----------------------------------------------------------------------------------
+//
+//        for (int i = 0; i < splittedbudget.length;i += 3) {
+//            Budget a = new Budget (String.valueOf(splittedbudget[i]), Double.valueOf(splittedbudget[i+1]), Integer.valueOf(splittedbudget[i+2]));
+//            budgetList.add(a);
+//        }
 
         //---------------------------------------------------------------------------------
         // POPULATING TABLEVIEW
         // -------------------------------------------------------------------------------
         budgetCategory.setCellValueFactory(new PropertyValueFactory<Budget, String>("budgetCategory"));
         budgetValue.setCellValueFactory(new PropertyValueFactory<Budget, Double>("budgetValue"));
-        percentage.setCellValueFactory(new PropertyValueFactory<Budget, Integer>("percentage"));
+        budgetPercentage.setCellValueFactory(new PropertyValueFactory<Budget, Integer>("budgetPercentage"));
         budgetTable.setItems(budgetList);
 
         budgetCategoryChooser.setItems(FXCollections.observableArrayList(categoryList));
@@ -789,7 +842,7 @@ public class Controller implements Initializable{
 
             List<String> formattingString = new ArrayList<>();
             for (int i = 0; i < budgetList.size();i++) {
-                formattingString.add(budgetList.get(i).getCategory() + ";" + budgetList.get(i).getValue() + ";" + budgetList.get(i).getPercentage());
+                formattingString.add(budgetList.get(i).getBudgetCategory() + ";" + budgetList.get(i).getBudgetValue() + ";" + budgetList.get(i).getBudgetPercentage());
             }
             String formattedString = String.join(";", formattingString);
 
@@ -825,7 +878,7 @@ public class Controller implements Initializable{
 
             List<String> formattingString = new ArrayList<>();
             for (int i = 0; i < budgetList.size();i++) {
-                formattingString.add(budgetList.get(i).getCategory() + ";" + budgetList.get(i).getValue() + ";" + budgetList.get(i).getPercentage());
+                formattingString.add(budgetList.get(i).getBudgetCategory() + ";" + budgetList.get(i).getBudgetValue() + ";" + budgetList.get(i).getBudgetPercentage());
             }
             String formattedString = String.join(";", formattingString);
 
@@ -855,7 +908,7 @@ public class Controller implements Initializable{
 
         //PIE CHART
 
-        categoryChartButton.setOnAction(e -> {
+        displayCategoryChartButton.setOnAction(e -> {
             categoryChartUpdater();
 
 
@@ -864,45 +917,38 @@ public class Controller implements Initializable{
         monthChartButton.setOnAction(e -> {
             piechart.getData().clear();
 
-            ObservableList<PieChart.Data> pieChartData =
-                    FXCollections.observableArrayList(
-                            new PieChart.Data("January: $" + januaryTotal, januaryTotal),
-                            new PieChart.Data("February: $" + februaryTotal, februaryTotal),
-                            new PieChart.Data("March: $" + marchTotal, marchTotal),
-                            new PieChart.Data("April: $" + aprilTotal, aprilTotal),
-                            new PieChart.Data("May: $" + mayTotal, mayTotal),
-                            new PieChart.Data("June: $" + juneTotal, juneTotal),
-                            new PieChart.Data("July: $" + julyTotal, julyTotal),
-                            new PieChart.Data("August: $" + augustTotal, augustTotal),
-                            new PieChart.Data("September: $" + septemberTotal, septemberTotal),
-                            new PieChart.Data("October: $" + octoberTotal, octoberTotal),
-                            new PieChart.Data("November: $" + novemberTotal, novemberTotal),
-                            new PieChart.Data("December: $" + decemberTotal, decemberTotal));
-
-
-            piechart.setTitle("Monthly analysis");
-            piechart.setData(pieChartData);
+            monthlyDataChart();
 
         });
 
-        ObservableList<PieChart.Data> pieChartData =
-                FXCollections.observableArrayList(
-                        new PieChart.Data("January: $" + januaryTotal, januaryTotal),
-                        new PieChart.Data("February: $" + februaryTotal, februaryTotal),
-                        new PieChart.Data("March: $" + marchTotal, marchTotal),
-                        new PieChart.Data("April: $" + aprilTotal, aprilTotal),
-                        new PieChart.Data("May: $" + mayTotal, mayTotal),
-                        new PieChart.Data("June: $" + juneTotal, juneTotal),
-                        new PieChart.Data("July: $" + julyTotal, julyTotal),
-                        new PieChart.Data("August: $" + augustTotal, augustTotal),
-                        new PieChart.Data("September: $" + septemberTotal, septemberTotal),
-                        new PieChart.Data("October: $" + octoberTotal, octoberTotal),
-                        new PieChart.Data("November: $" + novemberTotal, novemberTotal),
-                        new PieChart.Data("December: $" + decemberTotal, decemberTotal));
+        monthlyDataChart();
 
 
-        piechart.setTitle("Monthly analysis");
-        piechart.setData(pieChartData);
+        //---------------------------------------------------------------
+        //
+        //       MONTHLY BUDGET LOGIC
+        //
+        //---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         //BARCHART
@@ -942,6 +988,38 @@ public class Controller implements Initializable{
 
     }
 
+
+
+    private double getFilteredListSum() {
+        double sum = 0;
+        for (int i = 0; i < displayedEntryList.size(); i++) {
+            sum += displayedEntryList.get(i).getValue();
+        }
+        return sum;
+    }
+
+
+    private void monthlyDataChart() {
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList(
+                        new PieChart.Data("January: $" + januaryTotal, januaryTotal),
+                        new PieChart.Data("February: $" + februaryTotal, februaryTotal),
+                        new PieChart.Data("March: $" + marchTotal, marchTotal),
+                        new PieChart.Data("April: $" + aprilTotal, aprilTotal),
+                        new PieChart.Data("May: $" + mayTotal, mayTotal),
+                        new PieChart.Data("June: $" + juneTotal, juneTotal),
+                        new PieChart.Data("July: $" + julyTotal, julyTotal),
+                        new PieChart.Data("August: $" + augustTotal, augustTotal),
+                        new PieChart.Data("September: $" + septemberTotal, septemberTotal),
+                        new PieChart.Data("October: $" + octoberTotal, octoberTotal),
+                        new PieChart.Data("November: $" + novemberTotal, novemberTotal),
+                        new PieChart.Data("December: $" + decemberTotal, decemberTotal));
+
+
+        piechart.setTitle("Monthly analysis");
+        piechart.setData(pieChartData);
+    }
+
     private void categoryChartUpdater() {
         //clearing previous data
         piechart.getData().clear();
@@ -950,9 +1028,9 @@ public class Controller implements Initializable{
         ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
         for (int i = 0; i <  categoryList.size();i++) {
             double categoryTotal = 0;
-            for (int j = 0; j < filteredList.size();j++) {
-                if (filteredList.get(j).getCategory().equals(categoryList.get(i))) {
-                    categoryTotal += filteredList.get(j).getValue();
+            for (int j = 0; j < displayedEntryList.size(); j++) {
+                if (displayedEntryList.get(j).getCategory().equals(categoryList.get(i))) {
+                    categoryTotal += displayedEntryList.get(j).getValue();
                 }
             }
            pieChartData.add(new PieChart.Data(categoryList.get(i) + ": " + categoryTotal, categoryTotal));
@@ -960,6 +1038,7 @@ public class Controller implements Initializable{
 
         piechart.setTitle("Details per category:");
         piechart.setData(pieChartData);
+
     }
 
 

@@ -32,10 +32,6 @@ public class Entry  {
         setDescription(description);
     }
 
-    public SimpleStringProperty descriptionProperty() {
-        return description;
-    }
-
     public Double getValue() {
         return value.get();
     }
@@ -44,9 +40,6 @@ public class Entry  {
         setValue(value);
     }
 
-    public SimpleDoubleProperty valueProperty() {
-        return value;
-    }
 
     public int getDay() {
         return day.get();
@@ -56,9 +49,6 @@ public class Entry  {
         setDay(day);
     }
 
-    public SimpleIntegerProperty dayProperty() {
-        return day;
-    }
 
     public int getMonth() {
         return month.get();
@@ -68,9 +58,6 @@ public class Entry  {
         setMonth(month);
     }
 
-    public SimpleIntegerProperty monthProperty() {
-        return month;
-    }
 
     public int getYear() {
         return year.get();
@@ -80,9 +67,6 @@ public class Entry  {
         setYear(year);
     }
 
-    public SimpleIntegerProperty yearProperty() {
-        return year;
-    }
 
     public String getCategory() {
         return category.get();
@@ -92,9 +76,6 @@ public class Entry  {
         setCategory(category);
     }
 
-    public SimpleStringProperty categoryProperty() {
-        return category;
-    }
 
     @Override
     public String toString() {

@@ -17,6 +17,7 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
@@ -27,7 +28,7 @@
             <columns>
                 <TableColumn fx:id="description" prefWidth="144.0" sortType="DESCENDING" style="-fx-alignment: CENTER;" text="Description">
                 </TableColumn>
-                <TableColumn fx:id="value" editable="false" prefWidth="152.0" sortType="DESCENDING" style="-fx-alignment: CENTER;" text="Value">
+                <TableColumn fx:id="value" editable="false" prefWidth="152.0" sortType="DESCENDING" style="-fx-alignment: CENTER;" text="Amount spent: ">
                 </TableColumn>
                 <TableColumn fx:id="date" prefWidth="100.3651123046875" sortType="DESCENDING" style="-fx-alignment: CENTER;" text="Date" />
                 <TableColumn fx:id="category" prefWidth="100.6348876953125" sortType="DESCENDING" style="-fx-alignment: CENTER;" text="Category">
@@ -38,13 +39,13 @@
          </Button>
       <ChoiceBox fx:id="monthPicker" layoutX="845.0" layoutY="49.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="6.0" prefWidth="97.0" />
       <Label fx:id="monthLabel" layoutX="805.0" layoutY="57.0" prefHeight="17.0" prefWidth="50.0" text="Month:" />
-      <Label layoutX="50.0" layoutY="75.0" prefHeight="30.0" prefWidth="169.0" text="New entry">
+      <Label layoutX="50.0" layoutY="75.0" prefHeight="30.0" prefWidth="300.0" text="Add new expense">
          <font>
             <Font size="31.0" />
          </font>
       </Label>
       <Label layoutX="51.0" layoutY="122.0" text="Expense Description" />
-      <Label layoutX="53.0" layoutY="239.0" text="Value" />
+      <Label layoutX="53.0" layoutY="239.0" text="Amount spent:" />
       <DatePicker fx:id="datePicker" layoutX="46.0" layoutY="200.0" prefHeight="26.0" prefWidth="137.0" />
       <Label layoutX="53.0" layoutY="179.0" text="Date" />
       <TextField fx:id="descriptionTextField" layoutX="48.0" layoutY="142.0" prefHeight="21.0" prefWidth="141.0">
@@ -74,10 +75,9 @@
             <Font size="18.0" />
          </font>
       </RadioButton>
-      <Button  fx:id="monthChartButton" layoutX="969.0" layoutY="86.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="270.0" text="Details per month" />
-      <Button fx:id="categoryChartButton" layoutX="1246.0" layoutY="85.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="274.0" text="Details per category" />
-      <Label layoutX="548.0" layoutY="638.0" prefHeight="31.0" prefWidth="40.0" text="Sum:" />
-      <Label layoutX="601.0" layoutY="644.0" text="\$1000.00" />
+      <ToggleButton fx:id="monthChartButton" layoutX="969.0" layoutY="86.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="270.0" text="Details per month" />
+      <ToggleButton fx:id="displayCategoryChartButton" layoutX="1246.0" layoutY="85.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="274.0" text="Details per category" />
+      <Label fx:id="sumLabel" layoutX="612.0" layoutY="639.0" prefHeight="31.0" prefWidth="74.0" />
       <MenuBar layoutX="1.0" prefHeight="21.0" prefWidth="1199.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
@@ -144,7 +144,7 @@
             <columns>
                 <TableColumn fx:id="budgetCategory" prefWidth="74.0" text="Category" />
                 <TableColumn fx:id="budgetValue" prefWidth="57.5" text="Budget" />
-                <TableColumn fx:id="percentage" prefWidth="94.0" text="Alarm %" />
+                <TableColumn fx:id="budgetPercentage" prefWidth="94.0" text="Alarm %" />
             </columns>
         </TableView>
       <Button fx:id="addBudget" layoutX="305.0" layoutY="613.0" mnemonicParsing="false" text="Add" />

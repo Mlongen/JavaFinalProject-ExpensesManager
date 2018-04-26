@@ -8,48 +8,38 @@ public class Budget {
 
     private SimpleStringProperty budgetCategory;
     private SimpleDoubleProperty budgetValue;
-    private SimpleIntegerProperty percentage;
+    private SimpleIntegerProperty budgetPercentage;
 
-
-    public Budget(String budgetCategory, Double budgetValue, Integer percentage) {
+    public Budget(String budgetCategory, Double budgetValue, Integer budgetPercentage) {
         this.budgetCategory = new SimpleStringProperty(budgetCategory);
         this.budgetValue = new SimpleDoubleProperty(budgetValue);
-        this.percentage = new SimpleIntegerProperty(percentage);
+        this.budgetPercentage = new SimpleIntegerProperty(budgetPercentage);
     }
 
-    public String getCategory() {
+
+    //getters
+    public String getBudgetCategory() {
         return budgetCategory.get();
     }
 
-    public SimpleStringProperty budgetCategoryProperty() {
-        return budgetCategory;
-    }
-
-    public void setCategory(String category) {
-        this.budgetCategory.set(category);
-    }
-
-    public double getValue() {
+    public double getBudgetValue() {
         return budgetValue.get();
     }
 
-    public SimpleDoubleProperty budgetValueProperty() {
-        return budgetValue;
+
+    public int getBudgetPercentage() {
+        return budgetPercentage.get();
     }
 
-    public void setValue(double value) {
-        this.budgetValue.set(value);
+    public void setBudgetCategory(String budgetCategory) {
+        this.budgetCategory.set(budgetCategory);
     }
 
-    public int getPercentage() {
-        return percentage.get();
+    public void setBudgetValue(double budgetValue) {
+        this.budgetValue.set(budgetValue);
     }
 
-    public SimpleIntegerProperty percentageProperty() {
-        return percentage;
-    }
-
-    public void setPercentage(int percentage) {
-        this.percentage.set(percentage);
+    public void setBudgetPercentage(int budgetPercentage) {
+        this.budgetPercentage.set(budgetPercentage);
     }
 }
