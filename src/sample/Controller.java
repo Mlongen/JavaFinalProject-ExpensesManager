@@ -21,51 +21,26 @@
 
 public class Controller implements Initializable{
 
-    @FXML
-    private Label sumLabel;
-
-    private Database database;
-    @FXML
-    private TableView<Entry> table;
-    @FXML
-    private TableColumn<Entry, String> description;
-
-    @FXML
-    private TableColumn<Entry, Double> value;
-
-    @FXML
-    private TableColumn<Entry, String> date;
-
-    @FXML
-    private TableColumn<Entry, String> category;
+    //-------------------------------------------
+    //
+    //
+    //        ADD NEW ENTRY
+    //
+    //
 
     @FXML
     private TextField descriptionTextField;
 
     @FXML
-    private TextField valueTextField;
+    private DatePicker datePicker;
 
     @FXML
-    private DatePicker datePicker;
+    private TextField valueTextField;
 
     @FXML
     private Button addEntry;
 
-
-
-    @FXML
-    private Button deleteButton;
-
-    @FXML
-    private Label monthLabel;
-
-    @FXML
-    private ChoiceBox monthPicker;
-
-
-
-
-    //CATEGORY STUFF
+    // ------- CATEGORY STUFF
 
     @FXML
     private ChoiceBox categoryPicker;
@@ -82,6 +57,41 @@ public class Controller implements Initializable{
     @FXML
     private TextField categoryAdder;
 
+    //-----------------------------------------
+    //-----------------------------------------
+    //-----------------------------------------
+
+
+    @FXML
+    private TableView<Entry> table;
+    @FXML
+    private TableColumn<Entry, String> description;
+
+    @FXML
+    private TableColumn<Entry, Double> value;
+
+    @FXML
+    private TableColumn<Entry, String> date;
+
+    @FXML
+    private TableColumn<Entry, String> category;
+
+
+
+
+    @FXML
+    private Button deleteEntryButton;
+
+    @FXML
+    private ChoiceBox filterPicker;
+
+    @FXML
+    private Label monthLabel;
+
+    @FXML
+    private ChoiceBox monthPicker;
+
+
 
     //DATE FILTER STUFF
 
@@ -89,11 +99,16 @@ public class Controller implements Initializable{
     @FXML
     private DatePicker fromDatePicker;
 
+    //parameter that helps calculate fromRange of date period
+    private long fromMillis = 0;
+
     @FXML
     private DatePicker toDatePicker;
 
-    @FXML
-    private ChoiceBox filterPicker;
+    //parameter that helps calculate toRange of date period
+    private long toMillis = 0;
+
+
 
 
     //BUDGET STUFF---------------------------------------
@@ -131,11 +146,9 @@ public class Controller implements Initializable{
 
 
 
-    //parameter that helps calculate fromRange of date period
-    private long fromMillis;
 
-    //parameter that helps calculate toRange of date period
-    private long toMillis;
+
+
 
 
     private ObservableList<Entry> rawEntryList;
@@ -189,124 +202,70 @@ public class Controller implements Initializable{
 
     @FXML
     private CategoryAxis xAxis;
-    private String de;
+
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
+
+        //Create new Database object and read database.txt file
+        //Also populates the Database objects ArrayList<>
         createDB();
 
+        //Populate the tableColumns with the objects from the created database
+        populateTableColums();
+        //Adding logic to the Add expenses part
+        addEntryActionSetter();
+        setTodaysDateOnDatePicker();
 
-        //adding new entry
+        //Adding logic to the remove entry button
+        removeEntryActionSetter();
 
-        addEntry.setOnAction (e -> {
+        // Defining visiblity and stuff for the category adder
+        categoryAdderSetVisibility();
 
-            String description = descriptionTextField.getText().toString();
-            double value = Double.valueOf(valueTextField.getText());
-            int year = Integer.valueOf(datePicker.getValue().toString().substring(0, 4));
-            int month = Integer.valueOf(datePicker.getValue().toString().substring(5, 7));
-            int day = Integer.valueOf(datePicker.getValue().toString().substring(8, 10));
-            String category = categoryPicker.getSelectionModel().getSelectedItem().toString();
+        //Adding logic to the OK Button on the category manager
+        categoryOKButtonActionSetter();
 
-            Entry newEntry = new Entry(description, value, day, month, year, category);
-            rawEntryList.add(newEntry);
-            displayedEntryList.add(newEntry);
-            chartUpdater();
+        //Adding logic to the Remove Category  Button
+        removeCategoryActionSetter();
 
-            //CLEARING PICKERS
-            descriptionTextField.clear();
-            datePicker.setValue(null);
-            categoryPicker.setValue(null);
-            valueTextField.clear();
-            //-----------------------
-            List<String> formattingString = new ArrayList<>();
-            for (int i = 0; i < rawEntryList.size(); i++) {
-                formattingString.add(rawEntryList.get(i).getDescription() + ";" + rawEntryList.get(i).getValue() + ";" + rawEntryList.get(i).getDay() + ";" +
-                        rawEntryList.get(i).getMonth() + ";" + rawEntryList.get(i).getYear() + ";" + rawEntryList.get(i).getCategory());
-            }
-            String formattedString = String.join(";", formattingString);
+        //Setting the items on the filter Date Pickers, and setting visibility
+        setFilterPickersItemsAndVisibility();
 
-            //saves output file
+        //Adding logic to the filter date picker
+        filterPickerActionSetter();
 
-            try (PrintWriter out = new PrintWriter(new FileWriter("database.txt", false))) {
-                out.println(formattedString);
-            } catch (IOException z) {
-                z.printStackTrace();
-            }
+        //Setting the logic to the fromDatePicker
+        fromDatePickerActionSetter();
 
-        });
+        // Setting the logic to the toDatePicker, also embeds the SEARCH functionality
+        toDatePickerActionSetter();
 
+        //Adding logic to the month Filter, embeds categoryUpdater() functionality
+        monthFilterListenerAndActionSetter();
 
-        //----------------------------------------------------------------------
-        //
-        //              POPULATING TABLE COLUMNS
-        //
-        //----------------------------------------------------------------------
-        //
-        //              POPULATING MAIN TABLE
-        //----------------------------------------------------------------------
-        description.setCellValueFactory(new PropertyValueFactory<Entry, String>("description"));
-        value.setCellValueFactory(new PropertyValueFactory<Entry, Double>("value"));
-        category.setCellValueFactory(new PropertyValueFactory<Entry, String>("category"));
-        date.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(String.valueOf(cellData.getValue().getMonth() + "/" +cellData.getValue().getDay())));
-        table.setItems(displayedEntryList);
-        //----------------------------------------------------------------------
-        //
-        //              POPULATING BUDGET TABLE
-        //-----------------------------------------------------------------------
+        //Sets the char initial visibility and adds function to chart buttons
+        setInitialChartVisibilityAndActionSetter();
+
+        //Sets pieChart data
+        chartUpdater();
 
 
 
-        //listening for changes
+    }
 
-        // Setting choiceBox Items
-        monthPicker.setItems(FXCollections.observableArrayList(
-                "All", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
-        );
+    public void setTodaysDateOnDatePicker() {
+        String date = new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDate localDate = LocalDate.parse(date , formatter);
+        datePicker.setValue(localDate);
 
+        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    }
 
-        //category manager
-        categoryOK.setVisible(false);
-        categoryAdder.setVisible(false);
-//        Scanner inputcategory = null;
-//        try {
-//            inputcategory = new Scanner(new File("category.txt"));
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        String readcategory = inputcategory.nextLine();
-//        String[] splittedcategory = readcategory.split(";");
-//        categoryList.addAll(splittedcategory);
-//        categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
-
-        addCategory.pressedProperty().addListener((o, old, newValue) ->
-                categoryAdder.setVisible(true));
-        addCategory.pressedProperty().addListener((o, old, newValue) ->
-                categoryOK.setVisible(true));
-
-
-        categoryOK.setOnAction(e -> {
-            String categoryadderinput = categoryAdder.getCharacters().toString();
-            categoryList.add(categoryadderinput);
-            categoryAdder.setVisible(false);
-            categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
-
-            String[] categories = new String[categoryList.size()];
-            for (int i = 0; i < categoryList.size();i++) {
-                categories[i] = categoryList.get(i).toString();
-            }
-            String categoriesoutput = String.join(";", categories);
-            try (PrintWriter out = new PrintWriter(new FileWriter("category.txt", false))) {
-                out.println(categoriesoutput);
-            } catch (IOException z) {
-                z.printStackTrace();
-            }
-            categoryOK.setVisible(false);
-
-        });
-
-        //REMOVE BUTTON FOR CATEGORIES
-
+    public void setInitialChartVisibilityAndActionSetter() {
         barChart.setVisible(false);
 
         barChartButton.setOnAction((e -> {
@@ -320,111 +279,9 @@ public class Controller implements Initializable{
             piechart.setVisible(true);
 
         }));
+    }
 
-        removeCategory.setOnAction(e -> {
-            Object selectedString = categoryPicker.getSelectionModel().getSelectedItem();
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Category removal");
-            alert.setContentText("Are you sure you want to delete this category?");
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK){
-
-                //removes the item selected
-                categoryPicker.getItems().remove(selectedString);
-                categoryList.remove(selectedString);
-
-                //creates a formatted string for the output
-
-                String[] categories = new String[categoryList.size()];
-                for (int i = 0; i < categoryList.size();i++) {
-                    categories[i] = categoryList.get(i).toString();
-                }
-                String categoriesRemovedOutput = String.join(";", categories);
-                try (PrintWriter out = new PrintWriter(new FileWriter("category.txt", false))) {
-                    out.println(categoriesRemovedOutput);
-                } catch (IOException z) {
-                    z.printStackTrace();
-                }
-                categoryOK.setVisible(false);
-
-            }
-            else {
-                // ... user chose CANCEL or closed the dialog
-            }
-
-        });
-
-
-        //SETTING UP DATE PICKERS AND FILTERS
-
-        fromMillis = 0;
-        toMillis = 0;
-
-        fromDatePicker.setOnAction(e -> {
-                    String fromValue = fromDatePicker.getValue().toString();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    Date fromDate = null;
-                    try {
-                        fromDate = sdf.parse(fromValue);
-                    } catch (ParseException e1) {
-                        e1.printStackTrace();
-                    }
-                    fromMillis = fromDate.getTime();
-                    System.out.println(fromMillis);
-
-                }
-        );
-
-        toDatePicker.setOnAction(e -> {
-
-                    //GETTING THE DATE
-                    String fromValue = toDatePicker.getValue().toString();
-                    SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-                    Date fromDate = null;
-                    try {
-                        fromDate = sdf2.parse(fromValue);
-                    } catch (ParseException e1) {
-                        e1.printStackTrace();
-                    }
-                    toMillis = fromDate.getTime();
-
-                    // POPULATING THE FILTEREDLIST
-                    displayedEntryList.remove(0, displayedEntryList.size());
-                    for (int i = 0; i < rawEntryList.size(); i++) {
-
-                        long thisMillis = 0;
-                        String objectValue = rawEntryList.get(i).getYear() + "-" + rawEntryList.get(i).getMonth() + "-" + rawEntryList.get(i).getDay();
-                        SimpleDateFormat x = new SimpleDateFormat("yyyy-MM-dd");
-                        Date thisDate = null;
-                        try {
-                            thisDate = x.parse(objectValue);
-                        } catch (ParseException e1) {
-                            e1.printStackTrace();
-                        }
-                        thisMillis = thisDate.getTime();
-                        if (thisMillis > fromMillis && thisMillis <= toMillis) {
-                            displayedEntryList.add(rawEntryList.get(i));
-
-                        }
-                        else {
-                            // ... user chose CANCEL or closed the dialog
-                        }
-
-                    }
-
-                }
-        );
-
-        filterPicker.setItems(FXCollections.observableArrayList(
-                "Period", "Month")
-        );
-
-        monthPicker.setVisible(false);
-        monthLabel.setVisible(false);
-        fromDatePicker.setVisible(false);
-        toDatePicker.setVisible(false);
-
+    public void filterPickerActionSetter() {
         filterPicker.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
             if (newValue == "Period") {
                 monthPicker.setVisible(false);
@@ -442,9 +299,9 @@ public class Controller implements Initializable{
 
             }}
         );
+    }
 
-
-
+    public void monthFilterListenerAndActionSetter() {
         monthPicker.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
 
                     if (newValue == "All") {
@@ -589,22 +446,161 @@ public class Controller implements Initializable{
                     categoryChartUpdater();
                 }
         );
+    }
 
-        //SETTING PIECHART DATA
+    public void toDatePickerActionSetter() {
+        toDatePicker.setOnAction(e -> {
 
-        chartUpdater();
+                    //GETTING THE DATE
+                    String fromValue = toDatePicker.getValue().toString();
+                    SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+                    Date fromDate = null;
+                    try {
+                        fromDate = sdf2.parse(fromValue);
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                    toMillis = fromDate.getTime();
+
+                    // POPULATING THE FILTEREDLIST
+                    displayedEntryList.remove(0, displayedEntryList.size());
+                    for (int i = 0; i < rawEntryList.size(); i++) {
+
+                        long thisMillis = 0;
+                        String objectValue = rawEntryList.get(i).getYear() + "-" + rawEntryList.get(i).getMonth() + "-" + rawEntryList.get(i).getDay();
+                        SimpleDateFormat x = new SimpleDateFormat("yyyy-MM-dd");
+                        Date thisDate = null;
+                        try {
+                            thisDate = x.parse(objectValue);
+                        } catch (ParseException e1) {
+                            e1.printStackTrace();
+                        }
+                        thisMillis = thisDate.getTime();
+                        if (thisMillis > fromMillis && thisMillis <= toMillis) {
+                            displayedEntryList.add(rawEntryList.get(i));
+
+                        }
+                        else {
+                            // ... user chose CANCEL or closed the dialog
+                        }
+
+                    }
+
+                }
+        );
+    }
+
+    public void fromDatePickerActionSetter() {
+        fromDatePicker.setOnAction(e -> {
+                    String fromValue = fromDatePicker.getValue().toString();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date fromDate = null;
+                    try {
+                        fromDate = sdf.parse(fromValue);
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                    fromMillis = fromDate.getTime();
+                    System.out.println(fromMillis);
+
+                }
+        );
+    }
+
+    public void setFilterPickersItemsAndVisibility() {
+        filterPicker.setItems(FXCollections.observableArrayList(
+                "Period", "Month")
+        );
+
+        monthPicker.setItems(FXCollections.observableArrayList(
+                "All", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+        );
 
 
-        //set default date in date picker as current day
+        monthPicker.setVisible(false);
+        monthLabel.setVisible(false);
+        fromDatePicker.setVisible(false);
+        toDatePicker.setVisible(false);
+    }
 
-        String date = new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate localDate = LocalDate.parse(date , formatter);
-        datePicker.setValue(localDate);
+    public void populateTableColums() {
+        description.setCellValueFactory(new PropertyValueFactory<Entry, String>("description"));
+        value.setCellValueFactory(new PropertyValueFactory<Entry, Double>("value"));
+        category.setCellValueFactory(new PropertyValueFactory<Entry, String>("category"));
+        date.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(String.valueOf(cellData.getValue().getMonth() + "/" +cellData.getValue().getDay())));
+        table.setItems(displayedEntryList);
+    }
 
-        table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        //delete button action
-        deleteButton.setOnAction(e -> {
+    public void removeCategoryActionSetter() {
+        removeCategory.setOnAction(e -> {
+            Object selectedString = categoryPicker.getSelectionModel().getSelectedItem();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Category removal");
+            alert.setContentText("Are you sure you want to delete this category?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+
+                //removes the item selected
+                categoryPicker.getItems().remove(selectedString);
+                categoryList.remove(selectedString);
+
+                //creates a formatted string for the output
+
+                String[] categories = new String[categoryList.size()];
+                for (int i = 0; i < categoryList.size();i++) {
+                    categories[i] = categoryList.get(i).toString();
+                }
+                String categoriesRemovedOutput = String.join(";", categories);
+                try (PrintWriter out = new PrintWriter(new FileWriter("category.txt", false))) {
+                    out.println(categoriesRemovedOutput);
+                } catch (IOException z) {
+                    z.printStackTrace();
+                }
+                categoryOK.setVisible(false);
+
+            }
+            else {
+                // ... user chose CANCEL or closed the dialog
+            }
+
+        });
+    }
+
+    public void categoryOKButtonActionSetter() {
+        categoryOK.setOnAction(e -> {
+            String categoryadderinput = categoryAdder.getCharacters().toString();
+            categoryList.add(categoryadderinput);
+            categoryAdder.setVisible(false);
+            categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
+
+            String[] categories = new String[categoryList.size()];
+            for (int i = 0; i < categoryList.size();i++) {
+                categories[i] = categoryList.get(i).toString();
+            }
+            String categoriesoutput = String.join(";", categories);
+            try (PrintWriter out = new PrintWriter(new FileWriter("category.txt", false))) {
+                out.println(categoriesoutput);
+            } catch (IOException z) {
+                z.printStackTrace();
+            }
+            categoryOK.setVisible(false);
+
+        });
+    }
+
+    public void categoryAdderSetVisibility() {
+        categoryOK.setVisible(false);
+        categoryAdder.setVisible(false);
+
+        addCategory.pressedProperty().addListener((o, old, newValue) ->
+                categoryAdder.setVisible(true));
+        addCategory.pressedProperty().addListener((o, old, newValue) ->
+                categoryOK.setVisible(true));
+    }
+
+    public void removeEntryActionSetter() {
+        deleteEntryButton.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Entry removal");
             alert.setContentText("Are you sure you want to delete this entry?");
@@ -637,10 +633,49 @@ public class Controller implements Initializable{
             categoryChartUpdater();
 
         });
+    }
 
+    public void addEntryActionSetter() {
+        addEntry.setOnAction (e -> {
+
+            String description = descriptionTextField.getText().toString();
+            double value = Double.valueOf(valueTextField.getText());
+            int year = Integer.valueOf(datePicker.getValue().toString().substring(0, 4));
+            int month = Integer.valueOf(datePicker.getValue().toString().substring(5, 7));
+            int day = Integer.valueOf(datePicker.getValue().toString().substring(8, 10));
+            String category = categoryPicker.getSelectionModel().getSelectedItem().toString();
+
+            Entry newEntry = new Entry(description, value, day, month, year, category);
+            rawEntryList.add(newEntry);
+            displayedEntryList.add(newEntry);
+            chartUpdater();
+
+            //CLEARING PICKERS
+            descriptionTextField.clear();
+            datePicker.setValue(null);
+            categoryPicker.setValue(null);
+            valueTextField.clear();
+            //-----------------------
+            List<String> formattingString = new ArrayList<>();
+            for (int i = 0; i < rawEntryList.size(); i++) {
+                formattingString.add(rawEntryList.get(i).getDescription() + ";" + rawEntryList.get(i).getValue() + ";" + rawEntryList.get(i).getDay() + ";" +
+                        rawEntryList.get(i).getMonth() + ";" + rawEntryList.get(i).getYear() + ";" + rawEntryList.get(i).getCategory());
+            }
+            String formattedString = String.join(";", formattingString);
+
+            //saves output file
+
+            try (PrintWriter out = new PrintWriter(new FileWriter("database.txt", false))) {
+                out.println(formattedString);
+            } catch (IOException z) {
+                z.printStackTrace();
+            }
+
+        });
     }
 
     public void createDB() {
+
         //
         //
         //        READING DATABASE FILE

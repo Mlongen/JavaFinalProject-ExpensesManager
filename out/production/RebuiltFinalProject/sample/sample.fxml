@@ -12,7 +12,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -22,9 +21,9 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1600.0" style="-fx-background-image: url('file:bg.jpg');" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1580.0" style="-fx-background-image: url('file:bg2.jpg');" xmlns="http://javafx.com/javafx/9.0.4" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
     <children>
-        <TableView fx:id="table" layoutX="446.0" layoutY="86.0" prefHeight="556.0" prefWidth="524.0">
+        <TableView fx:id="table" layoutX="459.0" layoutY="86.0" prefHeight="556.0" prefWidth="524.0">
             <columns>
                 <TableColumn fx:id="description" prefWidth="144.0" sortType="DESCENDING" style="-fx-alignment: CENTER;" text="Description">
                 </TableColumn>
@@ -35,127 +34,107 @@
                 </TableColumn>
             </columns>
         </TableView>
-      <Button fx:id="deleteButton" layoutX="818.0" layoutY="646.0" mnemonicParsing="false" text="Remove selected entry">
+      <Button fx:id="deleteEntryButton" layoutX="824.0" layoutY="643.0" mnemonicParsing="false" text="Remove selected entry">
          </Button>
-      <ChoiceBox fx:id="monthPicker" layoutX="845.0" layoutY="49.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="6.0" prefWidth="97.0" />
-      <Label fx:id="monthLabel" layoutX="805.0" layoutY="57.0" prefHeight="17.0" prefWidth="50.0" text="Month:" />
-      <Label layoutX="50.0" layoutY="75.0" prefHeight="30.0" prefWidth="300.0" text="Add new expense">
+      <ChoiceBox fx:id="monthPicker" layoutX="852.0" layoutY="49.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="6.0" prefWidth="97.0" />
+      <Label fx:id="monthLabel" layoutX="812.0" layoutY="57.0" prefHeight="17.0" prefWidth="50.0" text="Month:" />
+      <Label layoutX="51.0" layoutY="45.0" prefHeight="30.0" prefWidth="300.0" text="Add new expense">
          <font>
             <Font size="31.0" />
          </font>
       </Label>
-      <Label layoutX="51.0" layoutY="122.0" text="Expense Description" />
-      <Label layoutX="53.0" layoutY="239.0" text="Amount spent:" />
-      <DatePicker fx:id="datePicker" layoutX="46.0" layoutY="200.0" prefHeight="26.0" prefWidth="137.0" />
-      <Label layoutX="53.0" layoutY="179.0" text="Date" />
-      <TextField fx:id="descriptionTextField" layoutX="48.0" layoutY="142.0" prefHeight="21.0" prefWidth="141.0">
+      <Label layoutX="51.0" layoutY="110.0" text="Expense Description" />
+      <Label layoutX="53.0" layoutY="227.0" text="Amount spent:" />
+      <DatePicker fx:id="datePicker" layoutX="47.0" layoutY="188.0" prefHeight="26.0" prefWidth="141.0" />
+      <Label layoutX="53.0" layoutY="170.0" text="Date" />
+      <TextField fx:id="descriptionTextField" layoutX="47.0" layoutY="130.0" prefHeight="26.0" prefWidth="141.0">
          <font>
             <Font size="9.0" />
          </font>
       </TextField>
-      <TextField fx:id="valueTextField" layoutX="49.0" layoutY="261.0" prefHeight="27.0" prefWidth="137.0">
+      <TextField fx:id="valueTextField" layoutX="47.0" layoutY="249.0" prefHeight="26.0" prefWidth="141.0">
          <font>
             <Font size="9.0" />
          </font>
       </TextField>
-      <Label layoutX="207.0" layoutY="123.0" text="Category" />
-      <PieChart fx:id="piechart" layoutX="983.0" layoutY="158.0" prefHeight="441.0" prefWidth="532.0" />
-      <Label layoutX="972.0" layoutY="34.0" prefHeight="38.0" prefWidth="196.0" text="Details">
+      <Label layoutX="230.0" layoutY="111.0" text="Category" />
+      <PieChart fx:id="piechart" layoutX="1008.0" layoutY="158.0" prefHeight="441.0" prefWidth="532.0" />
+      <Label layoutX="997.0" layoutY="34.0" prefHeight="38.0" prefWidth="196.0" text="Details">
          <font>
             <Font size="31.0" />
          </font>
       </Label>
-      <RadioButton layoutX="36.0" layoutY="295.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="78.0" scaleX="0.7" scaleY="0.7" selected="true" text="In">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </RadioButton>
-      <RadioButton layoutX="75.0" layoutY="296.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="78.0" scaleX="0.6" scaleY="0.6" scaleZ="0.6" text="Out">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </RadioButton>
-      <ToggleButton fx:id="monthChartButton" layoutX="969.0" layoutY="86.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="270.0" text="Details per month" />
-      <ToggleButton fx:id="displayCategoryChartButton" layoutX="1246.0" layoutY="85.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="274.0" text="Details per category" />
-      <Label fx:id="sumLabel" layoutX="612.0" layoutY="639.0" prefHeight="31.0" prefWidth="74.0" />
-      <MenuBar layoutX="1.0" prefHeight="21.0" prefWidth="1199.0">
+      <ToggleButton fx:id="monthChartButton" layoutX="994.0" layoutY="86.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="270.0" text="Details per month" />
+      <ToggleButton fx:id="displayCategoryChartButton" layoutX="1271.0" layoutY="85.0" mnemonicParsing="false" prefHeight="43.0" prefWidth="274.0" text="Details per category" />
+      <Label fx:id="sumLabel" layoutX="619.0" layoutY="639.0" prefHeight="31.0" prefWidth="74.0" />
+      <MenuBar layoutX="1.0" prefHeight="21.0" prefWidth="1600.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
               <MenuItem mnemonicParsing="false" text="Close" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Import">
-            <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-            </items>
-          </Menu>
         </menus>
       </MenuBar>
-      <ChoiceBox fx:id="categoryPicker" layoutX="222.0" layoutY="139.0" prefWidth="150.0" />
-      <Button fx:id="addCategory" layoutX="254.0" layoutY="170.0" mnemonicParsing="false" text="Add">
+      <ChoiceBox fx:id="categoryPicker" layoutX="245.0" layoutY="127.0" prefWidth="158.0" />
+      <Button fx:id="addCategory" layoutX="277.0" layoutY="158.0" mnemonicParsing="false" text="Add">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
-      <Button fx:id="removeCategory" layoutX="308.0" layoutY="170.0" mnemonicParsing="false" text="Remove">
+      <Button fx:id="removeCategory" layoutX="331.0" layoutY="158.0" mnemonicParsing="false" text="Remove">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
-      <TextField fx:id="categoryAdder" layoutX="232.0" layoutY="137.0" prefHeight="26.0" prefWidth="150.0" />
-      <Button fx:id="categoryOK" layoutX="380.0" layoutY="136.0" mnemonicParsing="false" text="OK">
+      <TextField fx:id="categoryAdder" layoutX="255.0" layoutY="125.0" prefHeight="26.0" prefWidth="150.0" />
+      <Button fx:id="categoryOK" layoutX="403.0" layoutY="124.0" mnemonicParsing="false" text="OK">
          <font>
             <Font size="10.0" />
          </font>
       </Button>
-      <Label layoutX="458.0" layoutY="60.0" prefHeight="18.0" prefWidth="65.0" text="Filter by:" />
-      <DatePicker fx:id="fromDatePicker" layoutX="690.0" layoutY="52.0" prefHeight="18.0" prefWidth="115.0" promptText="From" />
-      <DatePicker fx:id="toDatePicker" layoutX="820.0" layoutY="51.0" prefHeight="11.0" prefWidth="127.0" promptText="To" />
-      <ChoiceBox fx:id="filterPicker" layoutX="528.0" layoutY="52.0" prefHeight="26.0" prefWidth="87.0" />
-      <Button fx:id="pieChartButton" layoutX="976.0" layoutY="623.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="151.0" text="Pie Chart" />
-      <Button fx:id="barChartButton" layoutX="1174.0" layoutY="621.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="151.0" text="Bar Chart" />
-      <Button fx:id="lineChartButton" layoutX="1366.0" layoutY="618.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="151.0" text="Line Chart" />
-      <Label layoutX="53.0" layoutY="344.0" prefHeight="38.0" prefWidth="196.0" text="Budget">
+      <Label layoutX="457.0" layoutY="60.0" prefHeight="18.0" prefWidth="65.0" text="Filter by:" />
+      <DatePicker fx:id="fromDatePicker" layoutX="697.0" layoutY="52.0" prefHeight="18.0" prefWidth="115.0" promptText="From" />
+      <DatePicker fx:id="toDatePicker" layoutX="827.0" layoutY="51.0" prefHeight="11.0" prefWidth="127.0" promptText="To" />
+      <ChoiceBox fx:id="filterPicker" layoutX="527.0" layoutY="52.0" prefHeight="26.0" prefWidth="87.0" />
+      <Button fx:id="pieChartButton" layoutX="1002.0" layoutY="632.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="151.0" text="Pie Chart" />
+      <Button fx:id="barChartButton" layoutX="1200.0" layoutY="630.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="151.0" text="Bar Chart" />
+      <Button fx:id="lineChartButton" layoutX="1392.0" layoutY="630.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="151.0" text="Line Chart" />
+      <Label layoutX="53.0" layoutY="363.0" prefHeight="38.0" prefWidth="196.0" text="Alert">
          <font>
             <Font size="31.0" />
          </font>
       </Label>
-      <Button fx:id="addEntry" layoutX="209.0" layoutY="201.0" mnemonicParsing="false" prefHeight="96.0" prefWidth="176.0" text="Add Entry" />
-      <Label layoutX="54.0" layoutY="393.0" prefHeight="18.0" prefWidth="113.0" text="Choose category:" />
-      <ChoiceBox fx:id="budgetCategoryChooser" layoutX="52.0" layoutY="414.0" prefHeight="28.0" prefWidth="134.0" />
-      <Label layoutX="56.0" layoutY="452.0" prefHeight="18.0" prefWidth="113.0" text="Value:" />
-      <TextField fx:id="budgetValueTextField" layoutX="52.0" layoutY="471.0" prefHeight="26.0" prefWidth="134.0" />
-      <Line endX="300.0" layoutX="130.0" layoutY="330.0" startX="-120.0" />
+      <Button fx:id="addEntry" layoutX="245.0" layoutY="193.0" mnemonicParsing="false" prefHeight="83.0" prefWidth="158.0" text="Add Entry" />
+      <Label layoutX="54.0" layoutY="420.0" prefHeight="18.0" prefWidth="113.0" text="Choose category:" />
+      <ChoiceBox fx:id="budgetCategoryChooser" layoutX="47.0" layoutY="441.0" prefHeight="26.0" prefWidth="141.0" />
+      <Label layoutX="56.0" layoutY="479.0" prefHeight="18.0" prefWidth="113.0" text="Value:" />
+      <TextField fx:id="budgetValueTextField" layoutX="47.0" layoutY="498.0" prefHeight="26.0" prefWidth="141.0" />
+      <Line endX="300.0" layoutX="130.0" layoutY="340.0" startX="-120.0" />
 
-      <Label layoutX="226.0" layoutY="394.0" text="Current budgets:" />
+      <Label layoutX="214.0" layoutY="421.0" text="Current alerts:" />
 
 
 
 
         <!--BUDGET STUFF-->
 
-        <TableView fx:id="budgetTable" layoutX="225.0" layoutY="413.0" prefHeight="200.0" prefWidth="200.0">
+        <TableView fx:id="budgetTable" layoutX="213.0" layoutY="440.0" prefHeight="200.0" prefWidth="200.0">
             <columns>
                 <TableColumn fx:id="budgetCategory" prefWidth="74.0" text="Category" />
                 <TableColumn fx:id="budgetValue" prefWidth="57.5" text="Budget" />
                 <TableColumn fx:id="budgetPercentage" prefWidth="94.0" text="Alarm %" />
             </columns>
         </TableView>
-      <Button fx:id="addBudget" layoutX="305.0" layoutY="613.0" mnemonicParsing="false" text="Add" />
-      <Button fx:id="removeBudget" layoutX="362.0" layoutY="613.0" mnemonicParsing="false" text="Remove" />
-      <Label layoutX="56.0" layoutY="514.0" text="Alarm when:" />
-      <Slider fx:id="alarmPercentageSlider" layoutX="54.0" layoutY="535.0" prefHeight="24.0" prefWidth="124.0" showTickLabels="true" snapToTicks="true" value="50.0" />
-      <Label layoutX="177.0" layoutY="562.0" text="\%" />
+      <Button fx:id="addBudget" layoutX="301.0" layoutY="642.0" mnemonicParsing="false" text="Add" />
+      <Button fx:id="removeBudget" layoutX="348.0" layoutY="642.0" mnemonicParsing="false" text="Remove" />
+      <Label layoutX="56.0" layoutY="541.0" text="Alarm when:" />
+      <Slider fx:id="alarmPercentageSlider" layoutX="54.0" layoutY="562.0" prefHeight="24.0" prefWidth="124.0" showTickLabels="true" snapToTicks="true" value="50.0" />
+      <Label layoutX="177.0" layoutY="589.0" text="\%" />
 
         <!-- end -->
 
-      <BarChart fx:id="barChart" layoutX="991.0" layoutY="172.0">
+      <BarChart fx:id="barChart" layoutX="1016.0" layoutY="172.0">
         <xAxis>
           <CategoryAxis side="BOTTOM" fx:id="xAxis" />
         </xAxis>
@@ -163,7 +142,7 @@
           <NumberAxis fx:id="yAxis" side="LEFT" />
         </yAxis>
       </BarChart>
-      <LineChart fx:id="lineChart" layoutX="996.0" layoutY="144.0">
+      <LineChart fx:id="lineChart" layoutX="1021.0" layoutY="144.0">
         <xAxis>
           <CategoryAxis side="BOTTOM" />
         </xAxis>
