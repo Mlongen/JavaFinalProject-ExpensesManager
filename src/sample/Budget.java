@@ -6,11 +6,13 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class Budget {
 
+    private final int id;
     private SimpleStringProperty budgetCategory;
     private SimpleDoubleProperty budgetValue;
     private SimpleIntegerProperty budgetPercentage;
 
-    public Budget(String budgetCategory, Double budgetValue, Integer budgetPercentage) {
+    public Budget(int id, String budgetCategory, Double budgetValue, Integer budgetPercentage) {
+        this.id = id;
         this.budgetCategory = new SimpleStringProperty(budgetCategory);
         this.budgetValue = new SimpleDoubleProperty(budgetValue);
         this.budgetPercentage = new SimpleIntegerProperty(budgetPercentage);
@@ -18,6 +20,11 @@ public class Budget {
 
 
     //getters
+
+    public int getBudgetId() {
+        return id;
+    }
+
     public String getBudgetCategory() {
         return budgetCategory.get();
     }

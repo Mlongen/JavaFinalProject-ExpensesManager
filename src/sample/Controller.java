@@ -13,13 +13,16 @@
 
         import java.io.*;
         import java.net.URL;
+        import java.sql.Connection;
         import java.text.ParseException;
         import java.text.SimpleDateFormat;
         import java.time.LocalDate;
         import java.time.format.DateTimeFormatter;
         import java.util.*;
 
-public class Controller implements Initializable{
+        import static sample.Database.*;
+
+        public class Controller implements Initializable{
 
     //-------------------------------------------
     //
@@ -144,13 +147,6 @@ public class Controller implements Initializable{
 
 
 
-
-
-
-
-
-
-
     private ObservableList<Entry> rawEntryList;
 
     private ObservableList<Entry> displayedEntryList = FXCollections.observableArrayList();
@@ -204,32 +200,46 @@ public class Controller implements Initializable{
     private CategoryAxis xAxis;
 
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
 
-        //Create new Database object and read database.txt file
-        //Also populates the Database objects ArrayList<>
-        createDB();
+        Database db = new Database();
+        Connection conn = connect();
 
-        //Populate the tableColumns with the objects from the created database
-        populateTableColums();
+        db.readAllEntries(conn);
+        populateTableColums();//populate entry table
+        db.readAllBudgets(conn);
+
+        db.readCategories(conn);
+
+        rawEntryList = FXCollections.observableArrayList(db.getEntryObjects());
+        displayedEntryList.addAll(rawEntryList);
+        budgetList= FXCollections.observableArrayList(db.getBudgetObjects());
+        categoryList = FXCollections.observableArrayList(db.getCategories());
+        categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
+
         //Adding logic to the Add expenses part
-        addEntryActionSetter();
+        addEntryActionSetter(conn, db);
         setTodaysDateOnDatePicker();
 
         //Adding logic to the remove entry button
-        removeEntryActionSetter();
+        removeEntryActionSetter(conn);
+
+        //Adding logic to the remove budget button
+        removeBudgetActionSetter(conn);
 
         // Defining visiblity and stuff for the category adder
         categoryAdderSetVisibility();
 
         //Adding logic to the OK Button on the category manager
-        categoryOKButtonActionSetter();
+        categoryOKButtonActionSetter(conn);
 
         //Adding logic to the Remove Category  Button
-        removeCategoryActionSetter();
+        removeCategoryActionSetter(conn);
+
+        //Adding logic to the add budget
+        addBudgetActionSetter(conn);
 
         //Setting the items on the filter Date Pickers, and setting visibility
         setFilterPickersItemsAndVisibility();
@@ -249,21 +259,31 @@ public class Controller implements Initializable{
         //Sets the char initial visibility and adds function to chart buttons
         setInitialChartVisibilityAndActionSetter();
 
+        populateBudgetTable();//populate budget table
+
         //Sets pieChart data
         chartUpdater();
 
 
+    }
 
+    public void addBudgetActionSetter(Connection conn) {
+        addBudget.setOnAction((e -> {
+            insertBudget(conn, budgetCategoryChooser, budgetValueTextField, alarmPercentageSlider, budgetList);
+        }));
     }
 
     public void setTodaysDateOnDatePicker() {
         String date = new SimpleDateFormat("dd-MM-yyyy").format(Calendar.getInstance().getTime());
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate localDate = LocalDate.parse(date , formatter);
+        LocalDate localDate = LocalDate.parse(date, formatter);
         datePicker.setValue(localDate);
 
         table.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
+
+
+
 
     public void setInitialChartVisibilityAndActionSetter() {
         barChart.setVisible(false);
@@ -531,59 +551,30 @@ public class Controller implements Initializable{
         table.setItems(displayedEntryList);
     }
 
-    public void removeCategoryActionSetter() {
+    public void removeCategoryActionSetter(Connection conn) {
         removeCategory.setOnAction(e -> {
-            Object selectedString = categoryPicker.getSelectionModel().getSelectedItem();
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Category removal");
             alert.setContentText("Are you sure you want to delete this category?");
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK){
-
-                //removes the item selected
-                categoryPicker.getItems().remove(selectedString);
-                categoryList.remove(selectedString);
-
-                //creates a formatted string for the output
-
-                String[] categories = new String[categoryList.size()];
-                for (int i = 0; i < categoryList.size();i++) {
-                    categories[i] = categoryList.get(i).toString();
-                }
-                String categoriesRemovedOutput = String.join(";", categories);
-                try (PrintWriter out = new PrintWriter(new FileWriter("category.txt", false))) {
-                    out.println(categoriesRemovedOutput);
-                } catch (IOException z) {
-                    z.printStackTrace();
-                }
+                removeCategoryDB(conn, categoryPicker, categoryList);
                 categoryOK.setVisible(false);
 
-            }
-            else {
-                // ... user chose CANCEL or closed the dialog
             }
 
         });
     }
 
-    public void categoryOKButtonActionSetter() {
+    public void categoryOKButtonActionSetter(Connection conn) {
         categoryOK.setOnAction(e -> {
             String categoryadderinput = categoryAdder.getCharacters().toString();
             categoryList.add(categoryadderinput);
             categoryAdder.setVisible(false);
             categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
 
-            String[] categories = new String[categoryList.size()];
-            for (int i = 0; i < categoryList.size();i++) {
-                categories[i] = categoryList.get(i).toString();
-            }
-            String categoriesoutput = String.join(";", categories);
-            try (PrintWriter out = new PrintWriter(new FileWriter("category.txt", false))) {
-                out.println(categoriesoutput);
-            } catch (IOException z) {
-                z.printStackTrace();
-            }
+            insertCategory(conn, categoryAdder, categoryList);
             categoryOK.setVisible(false);
 
         });
@@ -599,7 +590,7 @@ public class Controller implements Initializable{
                 categoryOK.setVisible(true));
     }
 
-    public void removeEntryActionSetter() {
+    public void removeEntryActionSetter(Connection conn) {
         deleteEntryButton.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Entry removal");
@@ -609,145 +600,45 @@ public class Controller implements Initializable{
             if (result.get() == ButtonType.OK){
 
                 //removes the items selected
-                rawEntryList.removeAll(table.getSelectionModel().getSelectedItems());
-                table.getItems().removeAll(table.getSelectionModel().getSelectedItems());
-
-                //creates a formatted string for the output
-
-                List<String> formattingString = new ArrayList<>();
-                for (int i = 0; i < rawEntryList.size(); i++) {
-                    formattingString.add(rawEntryList.get(i).getDescription() + ";" + rawEntryList.get(i).getValue() + ";" + rawEntryList.get(i).getDay() + ";" +
-                            rawEntryList.get(i).getMonth() + ";" + rawEntryList.get(i).getYear() + ";" + rawEntryList.get(i).getCategory());
-                }
-                String formattedString = String.join(";", formattingString);
-
-                //saves output file
-
-                try (PrintWriter out = new PrintWriter(new FileWriter("database.txt", false))) {
-                    out.println(formattedString);
-                } catch (IOException z) {
-                    z.printStackTrace();
-                }
-
+                removeEntry(conn, table, rawEntryList);
+                chartUpdater();
             }
-            categoryChartUpdater();
+
 
         });
     }
+    public void removeBudgetActionSetter(Connection conn) {
+        budgetTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        removeBudget.setOnAction((e -> {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation");
+            alert.setContentText("Are you sure you want to delete this item?");
 
-    public void addEntryActionSetter() {
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK){
+                removeBudget(conn, budgetTable, budgetList);
+                }
+        }));
+    }
+
+
+
+    public void addEntryActionSetter(Connection conn, Database db) {
         addEntry.setOnAction (e -> {
 
-            String description = descriptionTextField.getText().toString();
-            double value = Double.valueOf(valueTextField.getText());
-            int year = Integer.valueOf(datePicker.getValue().toString().substring(0, 4));
-            int month = Integer.valueOf(datePicker.getValue().toString().substring(5, 7));
-            int day = Integer.valueOf(datePicker.getValue().toString().substring(8, 10));
-            String category = categoryPicker.getSelectionModel().getSelectedItem().toString();
 
-            Entry newEntry = new Entry(description, value, day, month, year, category);
-            rawEntryList.add(newEntry);
-            displayedEntryList.add(newEntry);
-            chartUpdater();
+            insertNewEntry(conn, db, descriptionTextField, valueTextField, datePicker, categoryPicker, rawEntryList, displayedEntryList);
 
             //CLEARING PICKERS
             descriptionTextField.clear();
             datePicker.setValue(null);
             categoryPicker.setValue(null);
             valueTextField.clear();
-            //-----------------------
-            List<String> formattingString = new ArrayList<>();
-            for (int i = 0; i < rawEntryList.size(); i++) {
-                formattingString.add(rawEntryList.get(i).getDescription() + ";" + rawEntryList.get(i).getValue() + ";" + rawEntryList.get(i).getDay() + ";" +
-                        rawEntryList.get(i).getMonth() + ";" + rawEntryList.get(i).getYear() + ";" + rawEntryList.get(i).getCategory());
-            }
-            String formattedString = String.join(";", formattingString);
-
-            //saves output file
-
-            try (PrintWriter out = new PrintWriter(new FileWriter("database.txt", false))) {
-                out.println(formattedString);
-            } catch (IOException z) {
-                z.printStackTrace();
-            }
-
+            chartUpdater();
         });
     }
 
-    public void createDB() {
 
-        //
-        //
-        //        READING DATABASE FILE
-        //
-        //
-
-        Scanner inputdb = null;
-        try {
-            inputdb = new Scanner(new File("database.txt"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        //reading database file
-        String readdb = inputdb.nextLine();
-        // creating new database object
-        Database db = new Database();
-        //populating database with scanner read
-        db.readAndCreateArray(readdb);
-        //creating observablelist to display tables
-
-        //POPULATING ENTRY LIST
-        rawEntryList = FXCollections.observableArrayList(db.getEntryObjects());
-        displayedEntryList.addAll(rawEntryList);
-        inputdb.close();
-
-
-        //
-        //
-        //       READING BUDGET FILE
-        //
-
-
-        //
-        budgetList= FXCollections.observableArrayList();
-        Scanner inputbudget = null;
-        try {
-            inputbudget = new Scanner(new File("budget.txt"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        String de = inputbudget.nextLine();
-        String[] splittedbudget = de.split(";");
-
-        //----------------------------------------------------------------------------------
-        //CREATING OBJECTS AND ADDING TO BUDGETLIST
-        //----------------------------------------------------------------------------------
-
-
-        for (int i = 0; i < splittedbudget.length;i += 3) {
-            Budget a = new Budget (String.valueOf(splittedbudget[i]), Double.valueOf(splittedbudget[i+1]), Integer.valueOf(splittedbudget[i+2]));
-            budgetList.add(a);
-        }
-        inputbudget.close();
-
-        //
-        //
-        //
-        //     READING CATEGORY FILE
-        //
-        //
-
-        Scanner inputcategory = null;
-        try {
-            inputcategory = new Scanner(new File("category.txt"));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        String readcategory = inputcategory.nextLine();
-        String[] splittedcategory = readcategory.split(";");
-        categoryList.addAll(splittedcategory);
-        categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
-    }
 
     private void chartUpdater() {
         januaryTotal = 0;
@@ -814,133 +705,6 @@ public class Controller implements Initializable{
 
         }
 
-        //---------------------------------------------------------------------------------
-        //
-        //
-        //            BUDGET MANAGER
-        //
-        //
-        //---------------------------------------------------------------------------------
-
-
-        //----------------------------------------------------------------------------------
-        //READING BUDGET FILE
-        //----------------------------------------------------------------------------------
-
-//        budgetList= FXCollections.observableArrayList();
-//        Scanner inputbudget = null;
-//        try {
-//            inputbudget = new Scanner(new File("budget.txt"));
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        String de = inputbudget.nextLine();
-//        String[] splittedbudget = de.split(";");
-//
-//
-//        //----------------------------------------------------------------------------------
-//        //CREATING OBJECTS AND ADDING TO BUDGETLIST
-//        //----------------------------------------------------------------------------------
-//
-//        for (int i = 0; i < splittedbudget.length;i += 3) {
-//            Budget a = new Budget (String.valueOf(splittedbudget[i]), Double.valueOf(splittedbudget[i+1]), Integer.valueOf(splittedbudget[i+2]));
-//            budgetList.add(a);
-//        }
-
-        //---------------------------------------------------------------------------------
-        // POPULATING TABLEVIEW
-        // -------------------------------------------------------------------------------
-        budgetCategory.setCellValueFactory(new PropertyValueFactory<Budget, String>("budgetCategory"));
-        budgetValue.setCellValueFactory(new PropertyValueFactory<Budget, Double>("budgetValue"));
-        budgetPercentage.setCellValueFactory(new PropertyValueFactory<Budget, Integer>("budgetPercentage"));
-        budgetTable.setItems(budgetList);
-
-        budgetCategoryChooser.setItems(FXCollections.observableArrayList(categoryList));
-
-        //---------------------------------------------------------------------------------
-        //ADDING TO BUDGETLIST
-        //---------------------------------------------------------------------------------
-
-        addBudget.setOnAction((e -> {
-
-            String chosenBudgetCategory = budgetCategoryChooser.getSelectionModel().getSelectedItem().toString();
-            Double chosenBudgetValue = Double.valueOf(budgetValueTextField.getText());
-            Integer chosenAlarmPercentage = (int)alarmPercentageSlider.getValue();
-
-            Budget newBudget = new Budget(chosenBudgetCategory, chosenBudgetValue, chosenAlarmPercentage);
-
-            budgetList.add(newBudget);
-         //-------------------------------------------------------------------------------
-         //
-         // EXPORTING TO TXT
-         //-------------------------------------------------------------------------------
-
-            List<String> formattingString = new ArrayList<>();
-            for (int i = 0; i < budgetList.size();i++) {
-                formattingString.add(budgetList.get(i).getBudgetCategory() + ";" + budgetList.get(i).getBudgetValue() + ";" + budgetList.get(i).getBudgetPercentage());
-            }
-            String formattedString = String.join(";", formattingString);
-
-            try (PrintWriter out = new PrintWriter(new FileWriter("budget.txt", false))) {
-                out.println(formattedString);
-            } catch (IOException z) {
-                z.printStackTrace();
-            }
-
-        }));
-
-        //---------------------------------------------------------------------------------
-        //
-        //  REMOVE BUTTON
-        //---------------------------------------------------------------------------------
-
-        budgetTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        removeBudget.setOnAction((e -> {
-            Object selectedItem = budgetTable.getSelectionModel().getSelectedItem();
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation");
-            alert.setContentText("Are you sure you want to delete this item?");
-
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK){
-
-                //removes the item selected
-                budgetTable.getItems().remove(selectedItem);
-                budgetList.remove(selectedItem);
-            }
-            else {
-            }
-
-            List<String> formattingString = new ArrayList<>();
-            for (int i = 0; i < budgetList.size();i++) {
-                formattingString.add(budgetList.get(i).getBudgetCategory() + ";" + budgetList.get(i).getBudgetValue() + ";" + budgetList.get(i).getBudgetPercentage());
-            }
-            String formattedString = String.join(";", formattingString);
-
-            try (PrintWriter out = new PrintWriter(new FileWriter("budget.txt", false))) {
-                out.println(formattedString);
-            } catch (IOException z) {
-                z.printStackTrace();
-            }
-
-
-        }));
-
-
-
-
-
-
-        //---------------------------------------------------------------------------------
-        //---------------------------------------------------------------------------------
-        //---------------------------------------------------------------------------------
-        //---------------------------------------------------------------------------------
-
-
-
-
-
-
         //PIE CHART
 
         displayCategoryChartButton.setOnAction(e -> {
@@ -957,33 +721,6 @@ public class Controller implements Initializable{
         });
 
         monthlyDataChart();
-
-
-        //---------------------------------------------------------------
-        //
-        //       MONTHLY BUDGET LOGIC
-        //
-        //---------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
         //BARCHART
@@ -1019,10 +756,17 @@ public class Controller implements Initializable{
         //LINE CHART
 
 
-
-
     }
 
+
+    private void populateBudgetTable() {
+        budgetCategory.setCellValueFactory(new PropertyValueFactory<Budget, String>("budgetCategory"));
+        budgetValue.setCellValueFactory(new PropertyValueFactory<Budget, Double>("budgetValue"));
+        budgetPercentage.setCellValueFactory(new PropertyValueFactory<Budget, Integer>("budgetPercentage"));
+        budgetTable.setItems(budgetList);
+
+        budgetCategoryChooser.setItems(FXCollections.observableArrayList(categoryList));
+    }
 
 
     private double getFilteredListSum() {

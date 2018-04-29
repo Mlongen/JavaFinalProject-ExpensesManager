@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class Entry  {
+    private int id;
     private SimpleStringProperty description;
     private SimpleDoubleProperty value;
     private SimpleIntegerProperty day;
@@ -14,7 +15,9 @@ public class Entry  {
 
 
 
-    public Entry(String description, double value, int day, int month, int year, String category) {
+
+    public Entry(int id, String description, double value, int day, int month, int year, String category) {
+        this.id = id;
         this.description = new SimpleStringProperty(description);
         this.value = new SimpleDoubleProperty(value);
         this.day = new SimpleIntegerProperty(day);
@@ -23,6 +26,10 @@ public class Entry  {
         this.category = new SimpleStringProperty(category);
     }
 
+
+    public int getId() {
+        return id;
+    }
 
     public String getDescription() {
         return description.get();
