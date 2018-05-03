@@ -5,12 +5,15 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXProgressBar;
 import com.jfoenix.controls.JFXTextField;
 import javafx.animation.PauseTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -18,7 +21,10 @@ import javafx.util.Duration;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static sample.Database.connect;
@@ -65,38 +71,33 @@ public class LoginController implements Initializable {
             pt.setDuration(Duration.seconds(1));
             pt.setOnFinished(ev -> {
 
-            int userid = db.getUserID(conn, userTextField.getText());
-            db.updateCurrentUser(conn,userid);
-            loadMainComponent();
+            if (isLogin(conn, userTextField.getText(), passwordTextField.getText())) {
+                int userid = db.getUserID(conn, userTextField.getText());
+                db.updateCurrentUser(conn,userid);
+                loadMainComponent();
                 try {
                     conn.close();
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
-                loginProgress.setVisible(false);
+
+            } else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText(null);
+                alert.setContentText("Wrong username/password");
+                alert.setOnHidden(evt -> {});
+
+                alert.show();
+
+            }
+
+            loginProgress.setVisible(false);
             });
             pt.play();
 
 
-
-
-
-
-
-
-
-
-
-
-
-
         }));
     }
-
-
-
-
-
 
     private void loadMainComponent() {
         try {
@@ -110,6 +111,26 @@ public class LoginController implements Initializable {
             Main.mainstg.close();
         } catch (IOException e1) {
             e1.printStackTrace();
+        }
+    }
+
+    public boolean isLogin(Connection conn, String username, String password) {
+        String query = "SELECT * FROM users where username = ? and password = ?";
+        try
+        {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return true;
+            }
+            return false;
+        }
+        catch (SQLException e)
+        {
+            return false;
         }
     }
 }
