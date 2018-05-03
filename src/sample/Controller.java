@@ -1,6 +1,10 @@
 
         package sample;
 
+        import com.jfoenix.controls.JFXButton;
+        import com.jfoenix.controls.JFXComboBox;
+        import com.jfoenix.controls.JFXDatePicker;
+        import com.jfoenix.controls.JFXSlider;
         import javafx.beans.property.ReadOnlyStringWrapper;
         import javafx.collections.FXCollections;
         import javafx.collections.ObservableList;
@@ -10,6 +14,7 @@
         import javafx.scene.control.*;
         import javafx.scene.control.cell.PropertyValueFactory;
         import javafx.scene.control.ChoiceBox;
+        import javafx.scene.text.Font;
 
         import java.io.*;
         import java.net.URL;
@@ -35,27 +40,27 @@
     private TextField descriptionTextField;
 
     @FXML
-    private DatePicker datePicker;
+    private JFXDatePicker datePicker;
 
     @FXML
     private TextField valueTextField;
 
     @FXML
-    private Button addEntry;
+    private JFXButton addEntry;
 
     // ------- CATEGORY STUFF
 
     @FXML
-    private ChoiceBox categoryPicker;
+    private JFXComboBox categoryPicker;
 
     @FXML
-    private Button addCategory;
+    private JFXButton addCategory;
 
     @FXML
-    private Button removeCategory;
+    private JFXButton removeCategory;
 
     @FXML
-    private Button categoryOK;
+    private JFXButton categoryOK;
 
     @FXML
     private TextField categoryAdder;
@@ -83,7 +88,7 @@
 
 
     @FXML
-    private Button deleteEntryButton;
+    private JFXButton deleteEntryButton;
 
     @FXML
     private ChoiceBox filterPicker;
@@ -117,10 +122,10 @@
     //BUDGET STUFF---------------------------------------
 
     @FXML
-    private Button addBudget;
+    private JFXButton addBudget;
 
     @FXML
-    private Button removeBudget;
+    private JFXButton removeBudget;
 
     @FXML
     private ChoiceBox budgetCategoryChooser;
@@ -138,7 +143,7 @@
     private TableColumn<Budget, Integer> budgetPercentage;
 
     @FXML
-    private Slider alarmPercentageSlider;
+    private JFXSlider alarmPercentageSlider;
 
     @FXML
     private TextField budgetValueTextField;
@@ -159,10 +164,10 @@
     // CHART STUFF
 
     @FXML
-    private ToggleButton displayCategoryChartButton;
+    private JFXButton displayCategoryChartButton;
 
     @FXML
-    private ToggleButton monthChartButton;
+    private JFXButton monthChartButton;
 
     @FXML
     private PieChart piechart;
@@ -185,10 +190,10 @@
     private BarChart<String, Number> barChart;
 
     @FXML
-    private Button barChartButton;
+    private JFXButton barChartButton;
 
     @FXML
-    private Button pieChartButton;
+    private JFXButton pieChartButton;
 
     @FXML
     private LineChart lineChart;
@@ -199,19 +204,20 @@
     @FXML
     private CategoryAxis xAxis;
 
+    private int userid;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-
         Database db = new Database();
         Connection conn = connect();
-
-        db.readAllEntries(conn);
+        //getting the user that is logged in
+        userid = db.getCurrentUser(conn);
+        System.out.println(userid);
+        db.readAllEntries(conn, userid);
         populateTableColums();//populate entry table
-        db.readAllBudgets(conn);
-
-        db.readCategories(conn);
+        db.readAllBudgets(conn, userid);
+        db.readCategories(conn, userid);
 
         rawEntryList = FXCollections.observableArrayList(db.getEntryObjects());
         displayedEntryList.addAll(rawEntryList);
@@ -265,11 +271,15 @@
         chartUpdater();
 
 
+        //DESIGN LOADING
+
+
+
     }
 
     public void addBudgetActionSetter(Connection conn) {
         addBudget.setOnAction((e -> {
-            insertBudget(conn, budgetCategoryChooser, budgetValueTextField, alarmPercentageSlider, budgetList);
+            insertBudget(conn, budgetCategoryChooser, budgetValueTextField, alarmPercentageSlider, budgetList, userid);
         }));
     }
 
@@ -559,7 +569,7 @@
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK){
-                removeCategoryDB(conn, categoryPicker, categoryList);
+                removeCategoryDB(conn, categoryPicker, categoryList, userid);
                 categoryOK.setVisible(false);
 
             }
@@ -574,7 +584,7 @@
             categoryAdder.setVisible(false);
             categoryPicker.setItems(FXCollections.observableArrayList(categoryList));
 
-            insertCategory(conn, categoryAdder, categoryList);
+            insertCategory(conn, categoryAdder, categoryList, userid);
             categoryOK.setVisible(false);
 
         });
@@ -600,7 +610,7 @@
             if (result.get() == ButtonType.OK){
 
                 //removes the items selected
-                removeEntry(conn, table, rawEntryList);
+                removeEntry(conn, table, rawEntryList, userid);
                 chartUpdater();
             }
 
@@ -616,7 +626,7 @@
 
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.OK){
-                removeBudget(conn, budgetTable, budgetList);
+                removeBudget(conn, budgetTable, budgetList, userid);
                 }
         }));
     }
@@ -627,7 +637,7 @@
         addEntry.setOnAction (e -> {
 
 
-            insertNewEntry(conn, db, descriptionTextField, valueTextField, datePicker, categoryPicker, rawEntryList, displayedEntryList);
+            insertNewEntry(conn, db, descriptionTextField, valueTextField, datePicker, categoryPicker, rawEntryList, displayedEntryList, userid);
 
             //CLEARING PICKERS
             descriptionTextField.clear();

@@ -1,5 +1,6 @@
 package sample;
 
+import com.jfoenix.controls.JFXComboBox;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 
@@ -11,14 +12,13 @@ public class Database {
     private ArrayList<Entry> entryObjects;
     private ArrayList<Budget> budgetObjects;
     private ArrayList categories;
-
+    private int userid;
     public Database() {
         entryObjects = new ArrayList<>();
         budgetObjects = new ArrayList<>();
         categories = new ArrayList();
 
     }
-
 
 
     public ArrayList<Entry> getEntryObjects() {
@@ -33,14 +33,14 @@ public class Database {
         return categories;
     }
 
-
-
+    public void setUserid(int userid) {
+        this.userid = userid;
+    }
 
     public String getObjectsAsFormattedString() {
         List<String> result = new ArrayList<>();
         for (int i = 0; i < entryObjects.size(); i++) {
-            result.add(entryObjects.get(i).getDescription() + ";" + entryObjects.get(i).getValue() + ";" + entryObjects.get(i).getDay() + ";" +
-                    entryObjects.get(i).getMonth() + ";" + entryObjects.get(i).getYear() + ";" + entryObjects.get(i).getCategory());
+            result.add(entryObjects.get(i).getDescription() + ";" + entryObjects.get(i).getValue() + ";" + entryObjects.get(i).getDay() + ";" + entryObjects.get(i).getMonth() + ";" + entryObjects.get(i).getYear() + ";" + entryObjects.get(i).getCategory());
         }
         return String.join(";", result);
     }
@@ -58,14 +58,13 @@ public class Database {
         return conn;
     }
 
-
-    public void readAllEntries(Connection conn) {
-        String query = "SELECT id, description, value, day, month, year, category FROM entries";
+    public void readAllEntries(Connection conn, int userid) {
+        String query = "SELECT id, description, value, day, month, year, category FROM entries WHERE user_id = ?";
         try {
-            // a. Create a statement
-            Statement stmt = conn.createStatement();
-            //b. Execute the query -> returns a ResultSet
-            ResultSet rs = stmt.executeQuery(query); //Iterator
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setInt(1, userid);
+
+            ResultSet rs = pstmt.executeQuery();
 
 
             while (rs.next()) {
@@ -79,7 +78,7 @@ public class Database {
 
     }
 
-    public static void insertNewEntry(Connection conn, Database db, TextField descriptionTextField, TextField valueTextField, DatePicker datePicker, ChoiceBox categoryPicker, ObservableList<Entry> rawEntryList, ObservableList<Entry> displayedEntryList) {
+    public static void insertNewEntry(Connection conn, Database db, TextField descriptionTextField, TextField valueTextField, DatePicker datePicker, JFXComboBox categoryPicker, ObservableList<Entry> rawEntryList, ObservableList<Entry> displayedEntryList, int userid) {
         int id = (int) System.currentTimeMillis();
         String description = descriptionTextField.getText().toString();
         double value = Double.valueOf(valueTextField.getText());
@@ -92,9 +91,8 @@ public class Database {
         rawEntryList.add(newEntry);
         displayedEntryList.add(newEntry);
 
-
         //-----------------------
-        String query = "INSERT INTO entries(id, description, value, day, month, year, category) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO entries(id, description, value, day, month, year, category, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement pstmt = conn.prepareStatement(query);  //Creates a prepared statement  based on your Query str
             pstmt.setInt(1, id);
@@ -104,6 +102,7 @@ public class Database {
             pstmt.setInt(5, month);
             pstmt.setInt(6, year);
             pstmt.setString(7, category);
+            pstmt.setInt(8, userid);
 
             pstmt.executeUpdate();
 
@@ -114,14 +113,14 @@ public class Database {
         }
     }
 
-
-    public static void removeEntry(Connection conn, TableView<Entry> table, ObservableList<Entry> rawEntryList) {
+    public static void removeEntry(Connection conn, TableView<Entry> table, ObservableList<Entry> rawEntryList, int userid) {
         ArrayList<Entry> deletionList = new ArrayList<>(table.getSelectionModel().getSelectedItems());
         for (int i = 0; i < deletionList.size(); i++) {
-            String query = "DELETE FROM entries WHERE id = ?";
+            String query = "DELETE FROM entries WHERE id = ? AND user_id = ?";
             try {
                 PreparedStatement pstmt = conn.prepareStatement(query);
                 pstmt.setInt(1, deletionList.get(i).getId());
+                pstmt.setInt(2, userid);
                 pstmt.executeUpdate();
 
             } catch (SQLException f) {
@@ -134,14 +133,14 @@ public class Database {
         table.getItems().removeAll(table.getSelectionModel().getSelectedItems());
     }
 
-
-    public static void removeBudget(Connection conn, TableView<Budget> budgetTable, ObservableList<Budget> budgetList) {
+    public static void removeBudget(Connection conn, TableView<Budget> budgetTable, ObservableList<Budget> budgetList, int userid) {
         ArrayList<Budget> deletionList = new ArrayList<>(budgetTable.getSelectionModel().getSelectedItems());
         for (int i = 0; i < deletionList.size(); i++) {
-            String query = "DELETE FROM budgets WHERE id = ?";
+            String query = "DELETE FROM budgets WHERE id = ? AND user_id = ?";
             try {
                 PreparedStatement pstmt = conn.prepareStatement(query);
                 pstmt.setInt(1, deletionList.get(i).getBudgetId());
+                pstmt.setInt(2, userid);
                 pstmt.executeUpdate();
 
             } catch (SQLException f) {
@@ -154,26 +153,14 @@ public class Database {
     }
 
 
-    public int readLastID(Connection conn) {
-        String query = "SELECT * FROM entries ORDER BY id DESC LIMIT 1;";
+    public void readAllBudgets(Connection conn, int userid) {
+        String query = "SELECT id, category, value, percentage FROM budgets WHERE user_id = ?";
         try {
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            return rs.getInt("id");
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setInt(1, userid);
 
-    public void readAllBudgets(Connection conn) {
-        String query = "SELECT id, category, value, percentage FROM budgets";
-        try {
-            // a. Create a statement
-            Statement stmt = conn.createStatement();
-            //b. Execute the query -> returns a ResultSet
-            ResultSet rs = stmt.executeQuery(query); //Iterator
+            ResultSet rs = pstmt.executeQuery();
 
 
             while (rs.next()) {
@@ -187,24 +174,25 @@ public class Database {
 
     }
 
-    public static void insertBudget(Connection conn, ChoiceBox budgetCategoryChooser, TextField budgetValueTextField, Slider alarmPercentageSlider, ObservableList<Budget> budgetList) {
+    public static void insertBudget(Connection conn, ChoiceBox budgetCategoryChooser, TextField budgetValueTextField, Slider alarmPercentageSlider, ObservableList<Budget> budgetList, int userid) {
         int id = (int) System.currentTimeMillis();
         String chosenBudgetCategory = budgetCategoryChooser.getSelectionModel().getSelectedItem().toString();
         Double chosenBudgetValue = Double.valueOf(budgetValueTextField.getText());
-        Integer chosenAlarmPercentage = (int)alarmPercentageSlider.getValue();
+        Integer chosenAlarmPercentage = (int) alarmPercentageSlider.getValue();
 
         Budget newBudget = new Budget(id, chosenBudgetCategory, chosenBudgetValue, chosenAlarmPercentage);
 
         budgetList.add(newBudget);
 
         //ADDING TO DATABASE
-        String query = "INSERT INTO budgets(id, category, value, percentage) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO budgets(id, category, value, percentage, user_id) VALUES (?, ?, ?, ?, ?)";
         try {
             PreparedStatement pstmt = conn.prepareStatement(query);  //Creates a prepared statement  based on your Query str
             pstmt.setInt(1, id);
             pstmt.setString(2, chosenBudgetCategory);
             pstmt.setDouble(3, chosenBudgetValue);
             pstmt.setInt(4, chosenAlarmPercentage);
+            pstmt.setInt(5, userid);
 
             pstmt.executeUpdate();
 
@@ -215,17 +203,18 @@ public class Database {
         }
     }
 
-    public static void insertCategory(Connection conn, TextField categoryAdder, ObservableList<String> categoryList) {
+    public static void insertCategory(Connection conn, TextField categoryAdder, ObservableList<String> categoryList, int userid) {
         int id = (int) System.currentTimeMillis();
         String category = categoryAdder.getCharacters().toString();
         categoryList.add(category);
 
         //ADDING TO DATABASE
-        String query = "INSERT INTO categories(id, category) VALUES (?, ?)";
+        String query = "INSERT INTO categories(id, category, user_id) VALUES (?, ?, ?)";
         try {
             PreparedStatement pstmt = conn.prepareStatement(query);  //Creates a prepared statement  based on your Query str
             pstmt.setInt(1, id);
             pstmt.setString(2, category);
+            pstmt.setInt(3, userid);
             pstmt.executeUpdate();
 
             System.out.println("Successfully inserted a new category");
@@ -235,37 +224,33 @@ public class Database {
         }
     }
 
-    public static void removeCategoryDB(Connection conn, ChoiceBox categoryPicker, ObservableList<String> categoryList) {
+    public static void removeCategoryDB(Connection conn, JFXComboBox categoryPicker, ObservableList<String> categoryList, int userid) {
         String selectedString = categoryPicker.getSelectionModel().getSelectedItem().toString();
-        String query = "DELETE FROM categories WHERE category = ?";
-            try {
-                PreparedStatement pstmt = conn.prepareStatement(query);
-                pstmt.setString(1, selectedString);
-                pstmt.executeUpdate();
+        String query = "DELETE FROM categories WHERE category = ? AND user_id = ?";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, selectedString);
+            pstmt.setInt(2, userid);
+            pstmt.executeUpdate();
 
-            } catch (SQLException f) {
-                f.printStackTrace();
+        } catch (SQLException f) {
+            f.printStackTrace();
 
-            }
+        }
 
 
         categoryPicker.getItems().remove(selectedString);
         categoryList.remove(selectedString);
     }
 
-
-
-
-
-
-
-    public void readCategories(Connection conn) {
-        String query = "SELECT category FROM categories";
+    public void readCategories(Connection conn, int userid) {
+        String query = "SELECT category FROM categories WHERE user_id = ?";
         try {
-            // a. Create a statement
-            Statement stmt = conn.createStatement();
-            //b. Execute the query -> returns a ResultSet
-            ResultSet rs = stmt.executeQuery(query); //Iterator
+
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setInt(1, userid);
+
+            ResultSet rs = pstmt.executeQuery();
 
 
             while (rs.next()) {
@@ -280,7 +265,54 @@ public class Database {
     }
 
 
+    public void updateCurrentUser(Connection conn, int thisUser) {
 
+        String query = "UPDATE currentdata SET currentuserid = ?";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setInt(1, thisUser);
+
+            pstmt.executeUpdate();
+            System.out.println("Update successful");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getUserID(Connection conn, String username) {
+        String query = "SELECT user_id FROM users WHERE username = ?";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, username);
+
+            ResultSet res = pstmt.executeQuery();
+
+            int result = res.getInt("user_id");
+            System.out.println(result);
+            return result;
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println();
+        }
+
+        return 0;
+    }
+
+    public int getCurrentUser(Connection conn) {
+        String query = "SELECT currentuserid FROM currentdata";
+        try {
+            Statement stmt = conn.createStatement();
+            //b. Execute the query -> returns a ResultSet
+            ResultSet rs = stmt.executeQuery(query); //Iterator
+            int result = rs.getInt(1);
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
 
 
