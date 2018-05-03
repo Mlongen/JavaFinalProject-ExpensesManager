@@ -65,38 +65,45 @@ public class LoginController implements Initializable {
 
         loginProgress.setVisible(false);
 
+        passwordTextField.setOnAction(e -> {
+            loginButtonPressed(db, conn);
+        });
+
         loginButton.setOnAction((e ->{
-            loginProgress.setVisible(true);
-            PauseTransition pt = new PauseTransition();
-            pt.setDuration(Duration.seconds(1));
-            pt.setOnFinished(ev -> {
-
-            if (isLogin(conn, userTextField.getText(), passwordTextField.getText())) {
-                int userid = db.getUserID(conn, userTextField.getText());
-                db.updateCurrentUser(conn,userid);
-                loadMainComponent();
-                try {
-                    conn.close();
-                } catch (SQLException e1) {
-                    e1.printStackTrace();
-                }
-
-            } else {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText(null);
-                alert.setContentText("Wrong username/password");
-                alert.setOnHidden(evt -> {});
-
-                alert.show();
-
-            }
-
-            loginProgress.setVisible(false);
-            });
-            pt.play();
-
+            loginButtonPressed(db, conn);
 
         }));
+    }
+
+    public void loginButtonPressed(Database db, Connection conn) {
+        loginProgress.setVisible(true);
+        PauseTransition pt = new PauseTransition();
+        pt.setDuration(Duration.seconds(1));
+        pt.setOnFinished(ev -> {
+
+        if (isLogin(conn, userTextField.getText(), passwordTextField.getText())) {
+            int userid = db.getUserID(conn, userTextField.getText());
+            db.updateCurrentUser(conn,userid);
+            loadMainComponent();
+            try {
+                conn.close();
+            } catch (SQLException e1) {
+                e1.printStackTrace();
+            }
+
+        } else {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText(null);
+            alert.setContentText("Wrong username/password");
+            alert.setOnHidden(evt -> {});
+
+            alert.show();
+
+        }
+
+        loginProgress.setVisible(false);
+        });
+        pt.play();
     }
 
     private void loadMainComponent() {
