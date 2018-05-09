@@ -17,19 +17,34 @@
             <Image url="@loginimage.jpg" />
          </image>
       </ImageView>
-      <JFXTextField fx:id="userTextField" focusColor="transparent" layoutX="277.0" layoutY="256.0" prefHeight="34.0" prefWidth="200.0" promptText="E-mail" style="-fx-text-fill: grey; -fx-background-color: transparent;" unFocusColor="transparent">
+      <JFXButton fx:id="loginButton" layoutX="261.0" layoutY="374.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="loginButton" text="Login" />
+      <JFXButton fx:id="createACCButton" layoutX="396.0" layoutY="374.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="createButton" text="Create account" />
+      <ImageView fx:id="createUserImage" fitHeight="500.0" fitWidth="600.0" layoutX="134.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@createuser.jpg" />
+         </image>
+      </ImageView>
+      <JFXTextField fx:id="userTextField" focusColor="transparent" layoutX="277.0" layoutY="256.0" prefHeight="34.0" prefWidth="200.0" promptText="Username" style="-fx-text-fill: grey; -fx-background-color: transparent;" unFocusColor="transparent">
          <font>
             <Font size="15.0" />
          </font>
       </JFXTextField>
-      <JFXPasswordField fx:id="passwordTextField" focusColor="transparent" layoutX="277.0" layoutY="310.0" prefHeight="34.0" prefWidth="200.0" style="-fx-background-color: transparent;" unFocusColor="transparent" />
-      <JFXButton fx:id="loginButton" layoutX="261.0" layoutY="374.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="loginButton" text="Login" />
-      <JFXProgressBar fx:id="loginProgress" layoutX="291.0" layoutY="449.0" style="-fx-background-color: blue;" />
-      <JFXButton fx:id="createACCButton" layoutX="396.0" layoutY="374.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="createButton" text="Create account" />
-      <Label alignment="CENTER" layoutX="335.0" layoutY="201.0" prefHeight="36.0" prefWidth="117.0" style="-fx-background-color: white;" text="LOGIN" textFill="#56a4d5">
+      <JFXPasswordField fx:id="passwordTextField" focusColor="transparent" layoutX="277.0" layoutY="310.0" prefHeight="34.0" prefWidth="200.0" promptText="Password" style="-fx-text-fill: grey;" unFocusColor="transparent">
          <font>
-            <Font name="DIN Condensed Bold" size="30.0" />
+            <Font size="15.0" />
+         </font></JFXPasswordField>
+      <Label fx:id="loginLabel" alignment="CENTER" layoutX="294.0" layoutY="201.0" prefHeight="36.0" prefWidth="200.0" style="-fx-background-color: white;" text="LOGIN" textFill="#56a4d5">
+         <font>
+            <Font name="D-DIN Condensed" size="30.0" />
          </font>
       </Label>
+      <JFXProgressBar fx:id="loginProgress" layoutX="294.0" layoutY="468.0" />
+      <JFXPasswordField fx:id="confirmPasswordTextField" focusColor="transparent" layoutX="277.0" layoutY="365.0" prefHeight="34.0" prefWidth="200.0" promptText="Confirm password" style="-fx-text-fill: grey;" unFocusColor="transparent">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </JFXPasswordField>
+      <JFXButton fx:id="submitButton" layoutX="259.0" layoutY="418.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="submit-button" text="Submit" />
+      <JFXButton fx:id="cancelCreateUser" layoutX="402.0" layoutY="418.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="cancel-button" text="Cancel" />
    </children>
 </AnchorPane>

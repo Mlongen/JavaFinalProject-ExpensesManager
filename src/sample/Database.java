@@ -1,6 +1,8 @@
 package sample;
 
 import com.jfoenix.controls.JFXComboBox;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 
@@ -174,7 +176,7 @@ public class Database {
 
     }
 
-    public static void insertBudget(Connection conn, ChoiceBox budgetCategoryChooser, TextField budgetValueTextField, Slider alarmPercentageSlider, ObservableList<Budget> budgetList, int userid) {
+    public static void insertBudget(Connection conn, JFXComboBox budgetCategoryChooser, TextField budgetValueTextField, Slider alarmPercentageSlider, ObservableList<Budget> budgetList, int userid) {
         int id = (int) System.currentTimeMillis();
         String chosenBudgetCategory = budgetCategoryChooser.getSelectionModel().getSelectedItem().toString();
         Double chosenBudgetValue = Double.valueOf(budgetValueTextField.getText());
@@ -273,7 +275,6 @@ public class Database {
             pstmt.setInt(1, thisUser);
 
             pstmt.executeUpdate();
-            System.out.println("Update successful");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -288,13 +289,13 @@ public class Database {
             ResultSet res = pstmt.executeQuery();
 
             int result = res.getInt("user_id");
-            System.out.println(result);
+
             return result;
 
 
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println();
+
         }
 
         return 0;
@@ -315,6 +316,26 @@ public class Database {
     }
 
 
+    public void insertNewUser(Connection conn, JFXTextField userTextField , JFXPasswordField passwordTextField) {
+        int user_id = (int) System.currentTimeMillis();
+        String username = userTextField.getText();
+        String password = passwordTextField.getText();
+        //ADDING TO DATABASE
+        String query = "INSERT INTO users(user_id, username, password) VALUES (?, ?, ?)";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(query);  //Creates a prepared statement  based on your Query str
+            pstmt.setInt(1, user_id);
+            pstmt.setString(2, username);
+            pstmt.setString(3, password);
+            pstmt.executeUpdate();
+
+            System.out.println("Successfully inserted a new user");
+
+        } catch (SQLException z) {
+            z.printStackTrace();
+        }
+
+    }
 
 
 }

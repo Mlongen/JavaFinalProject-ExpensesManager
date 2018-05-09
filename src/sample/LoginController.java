@@ -1,9 +1,6 @@
 package sample;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXPasswordField;
-import com.jfoenix.controls.JFXProgressBar;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.*;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -14,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -50,6 +48,21 @@ public class LoginController implements Initializable {
     @FXML
     private JFXProgressBar loginProgress;
 
+    @FXML
+    private JFXButton submitButton;
+
+    @FXML
+    private JFXButton cancelCreateUser;
+
+    @FXML
+    private JFXPasswordField confirmPasswordTextField;
+
+    @FXML
+    private ImageView createUserImage;
+
+    @FXML
+    private Label loginLabel;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -58,10 +71,67 @@ public class LoginController implements Initializable {
         Database db = new Database();
         Connection conn = connect();
 
+        //Hide the create user button
+
+        submitButton.setVisible(false);
+        confirmPasswordTextField.setVisible(false);
+        createUserImage.setVisible(false);
+        cancelCreateUser.setVisible(false);
+
+        createACCButton.setOnAction((e -> {
+            loginLabel.setText("CREATE ACCOUNT");
+            submitButton.setVisible(true);
+            confirmPasswordTextField.setVisible(true);
+            createUserImage.setVisible(true);
+            cancelCreateUser.setVisible(true);
+        }));
+
+        submitButton.setOnAction((e -> {
+            if (!doesLoginExist(conn)) {
+                if (passwordTextField.getText().equals(confirmPasswordTextField.getText())) {
+                    loginProgress.setVisible(true);
+                    PauseTransition pt = new PauseTransition();
+                    pt.setDuration(Duration.seconds(1));
+                    pt.setOnFinished(ev -> {
+                        db.insertNewUser(conn, userTextField, passwordTextField);
+                        loginLabel.setText("LOGIN");
+                        submitButton.setVisible(false);
+                        confirmPasswordTextField.setVisible(false);
+                        createUserImage.setVisible(false);
+                        loginProgress.setVisible(false);
+                    });
+                    pt.play();
+
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setHeaderText(null);
+                    alert.setContentText("Passwords do not match.");
+                    alert.setOnHidden(evt -> {});
+
+                    alert.show();
+                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText(null);
+                alert.setContentText("User already exists.");
+                alert.setOnHidden(evt -> {});
+
+                alert.show();
+            }
+
+
+        }));
 
 
 
-
+        cancelCreateUser.setOnAction((e -> {
+            loginLabel.setText("LOGIN");
+            submitButton.setVisible(false);
+            confirmPasswordTextField.setVisible(false);
+            createUserImage.setVisible(false);
+            loginProgress.setVisible(false);
+            cancelCreateUser.setVisible(false);
+        }));
 
         loginProgress.setVisible(false);
 
@@ -75,11 +145,14 @@ public class LoginController implements Initializable {
         }));
     }
 
+
+
     public void loginButtonPressed(Database db, Connection conn) {
         loginProgress.setVisible(true);
         PauseTransition pt = new PauseTransition();
         pt.setDuration(Duration.seconds(1));
         pt.setOnFinished(ev -> {
+
 
         if (isLogin(conn, userTextField.getText(), passwordTextField.getText())) {
             int userid = db.getUserID(conn, userTextField.getText());
@@ -130,10 +203,25 @@ public class LoginController implements Initializable {
             pstmt.setString(2, password);
 
             ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return true;
-            }
+            return rs.next();
+        }
+        catch (SQLException e)
+        {
             return false;
+        }
+    }
+
+
+    public boolean doesLoginExist(Connection conn) {
+        String username = userTextField.getText();
+        String query = "SELECT * FROM users where username = ?";
+        try
+        {
+            PreparedStatement pstmt = conn.prepareStatement(query);
+            pstmt.setString(1, username);
+
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next();
         }
         catch (SQLException e)
         {

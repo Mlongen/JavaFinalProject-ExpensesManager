@@ -10,12 +10,15 @@ public class Budget {
     private SimpleStringProperty budgetCategory;
     private SimpleDoubleProperty budgetValue;
     private SimpleIntegerProperty budgetPercentage;
+    private SimpleIntegerProperty budgetCurrent;
 
     public Budget(int id, String budgetCategory, Double budgetValue, Integer budgetPercentage) {
         this.id = id;
         this.budgetCategory = new SimpleStringProperty(budgetCategory);
         this.budgetValue = new SimpleDoubleProperty(budgetValue);
         this.budgetPercentage = new SimpleIntegerProperty(budgetPercentage);
+        this.budgetCurrent = new SimpleIntegerProperty(0);
+
     }
 
 
@@ -48,5 +51,17 @@ public class Budget {
 
     public void setBudgetPercentage(int budgetPercentage) {
         this.budgetPercentage.set(budgetPercentage);
+    }
+
+    public int getBudgetCurrent() {
+        return budgetCurrent.get();
+    }
+
+    public SimpleIntegerProperty budgetCurrentProperty() {
+        return budgetCurrent;
+    }
+
+    public void setBudgetCurrent(int budgetCurrent) {
+        this.budgetCurrent.set(budgetCurrent);
     }
 }
