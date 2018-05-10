@@ -2,33 +2,22 @@
         package sample;
 
         import com.jfoenix.controls.*;
-        import com.jfoenix.validation.RequiredFieldValidator;
+
+        import javafx.animation.PauseTransition;
         import javafx.beans.binding.Bindings;
         import javafx.beans.property.ReadOnlyStringWrapper;
-        import javafx.beans.property.SimpleStringProperty;
-        import javafx.beans.value.ChangeListener;
-        import javafx.beans.value.ObservableValue;
         import javafx.collections.FXCollections;
         import javafx.collections.ObservableList;
         import javafx.fxml.FXML;
-        import javafx.fxml.FXMLLoader;
         import javafx.fxml.Initializable;
-        import javafx.scene.Node;
-        import javafx.scene.Parent;
-        import javafx.scene.Scene;
         import javafx.scene.chart.*;
         import javafx.scene.control.*;
         import javafx.scene.control.cell.PropertyValueFactory;
-        import javafx.scene.control.ChoiceBox;
         import javafx.scene.image.ImageView;
-        import javafx.scene.layout.StackPane;
-
         import javafx.scene.paint.Color;
-        import javafx.scene.text.Font;
-        import javafx.stage.Stage;
+        import javafx.util.Duration;
 
-
-        import java.io.*;
+        import javax.management.BadAttributeValueExpException;
         import java.net.URL;
         import java.sql.Connection;
         import java.text.ParseException;
@@ -36,10 +25,7 @@
         import java.time.LocalDate;
         import java.time.format.DateTimeFormatter;
         import java.util.*;
-
-        import static javafx.scene.paint.Color.BLUE;
         import static javafx.scene.paint.Color.RED;
-        import static javafx.scene.paint.Color.color;
         import static sample.Database.*;
 
         public class Controller implements Initializable {
@@ -55,8 +41,7 @@
 
             @FXML
             private MenuItem exitButton;
-            @FXML
-            private MenuItem logoutButton;
+
 
 
             @FXML
@@ -118,13 +103,13 @@
             private JFXButton deleteEntryButton;
 
             @FXML
-            private ChoiceBox filterPicker;
+            private JFXComboBox filterPicker;
 
             @FXML
             private Label monthLabel;
 
             @FXML
-            private ChoiceBox monthPicker;
+            private JFXComboBox monthPicker;
 
 
             //DATE FILTER STUFF
@@ -162,19 +147,20 @@
             private TableColumn<Budget, String> budgetCategory;
 
             @FXML
-            private TableColumn<Budget, Double> budgetValue;
+            private TableColumn<Budget, String> budgetValue;
 
             @FXML
-            private TableColumn<Budget, Integer> budgetPercentage;
+            private TableColumn<Budget, String> budgetPercentage;
 
             @FXML
-            private TableColumn<Budget, Integer> budgetCurrent;
+            private TableColumn<Budget, String> budgetCurrent;
 
             @FXML
             private JFXSlider alarmPercentageSlider;
 
             @FXML
             private JFXTextField budgetValueTextField;
+
 
 
             //-----------------------------------------------------
@@ -189,18 +175,10 @@
             private ObservableList<Budget> budgetList = FXCollections.observableArrayList();
 
 
-
             // CHART STUFF
 
-
             @FXML
-            private JFXButton displayCategoryChartButton;
-
-            @FXML
-            private ChoiceBox chartPicker;
-
-            @FXML
-            private JFXButton monthChartButton;
+            private JFXComboBox chartPicker;
 
             @FXML
             private PieChart piechart;
@@ -223,12 +201,6 @@
             private StackedBarChart<String, Number> barChart;
 
             @FXML
-            private JFXButton barChartButton;
-
-            @FXML
-            private JFXButton pieChartButton;
-
-            @FXML
             private ImageView descriptionX;
 
             @FXML
@@ -243,17 +215,16 @@
             @FXML
             private Label entryErrorLabel;
 
+
+
             @FXML
-            private Label budgetErrorLabel;
+            private ImageView budgetWarning;
 
             @FXML
             private ImageView alertCategoryX;
 
             @FXML
             private ImageView alertValueX;
-
-            @FXML
-            private ImageView tutorialImage;
 
             @FXML
             private NumberAxis yAxis;
@@ -263,6 +234,19 @@
 
             private int userid;
 
+
+            private ArrayList<Entry> januaryExpenses = new ArrayList<>();
+            private ArrayList<Entry> februaryExpenses = new ArrayList<>();
+            private ArrayList<Entry> marchExpenses = new ArrayList<>();
+            private ArrayList<Entry> aprilExpenses = new ArrayList<>();
+            private ArrayList<Entry> mayExpenses = new ArrayList<>();
+            private ArrayList<Entry> juneExpenses = new ArrayList<>();
+            private ArrayList<Entry> julyExpenses = new ArrayList<>();
+            private ArrayList<Entry> augustExpenses = new ArrayList<>();
+            private ArrayList<Entry> septemberExpenses = new ArrayList<>();
+            private ArrayList<Entry> octoberExpenses = new ArrayList<>();
+            private ArrayList<Entry> novemberExpenses = new ArrayList<>();
+            private ArrayList<Entry> decemberExpenses = new ArrayList<>();
 
             @Override
             public void initialize(URL location, ResourceBundle resources) {
@@ -275,8 +259,6 @@
                 populateTableColums();//populate entry table
                 db.readAllBudgets(conn, userid);
                 db.readCategories(conn, userid);
-                db.readAllBudgets(conn, userid);
-
                 rawEntryList = FXCollections.observableArrayList(db.getEntryObjects());
                 displayedEntryList.addAll(rawEntryList);
                 budgetList = FXCollections.observableArrayList(db.getBudgetObjects());
@@ -287,7 +269,7 @@
                 addEntryActionSetter(conn, db);
                 setTodaysDateOnDatePicker();
 
-                sum.setText(String.valueOf(getFilteredListSum()));
+                sum.setText("$" + String.valueOf(getFilteredListSum()) + "0");
 
                 //Adding logic to the remove entry button
                 removeEntryActionSetter(conn);
@@ -327,12 +309,15 @@
                 setInitialChartVisibilityAndActionSetter();
 
                 populateBudgetTable();//populate budget table
+                updateTrackers(budgetWarning, budgetList, rawEntryList);
+
 
                 //Sets pieChart data
                 chartUpdater();
+                categoryChartUpdater();
 
 
-                chartPicker.setItems(FXCollections.observableArrayList("Monthly", "Category"));
+                chartPicker.setItems(FXCollections.observableArrayList("Yearly", "Category", "Mixed"));
                 chartPickerActionSetter();
                 //DESIGN LOADING
 
@@ -341,9 +326,9 @@
                 amountX.setVisible(false);
                 entryCategoryX.setVisible(false);
                 entryErrorLabel.setVisible(false);
-                budgetErrorLabel.setVisible(false);
                 alertCategoryX.setVisible(false);
                 alertValueX.setVisible(false);
+                budgetWarning.setVisible(false);
 
 
                 exitButton.setOnAction((e -> {
@@ -361,27 +346,26 @@
                 }));
 
 
-                ArrayList<Entry> januaryExpenses = new ArrayList<>();
-                ArrayList<Entry> februaryExpenses = new ArrayList<>();
-                ArrayList<Entry> marchExpenses = new ArrayList<>();
-                ArrayList<Entry> aprilExpenses = new ArrayList<>();
-                ArrayList<Entry> mayExpenses = new ArrayList<>();
-                ArrayList<Entry> juneExpenses = new ArrayList<>();
-                ArrayList<Entry> julyExpenses = new ArrayList<>();
-                ArrayList<Entry> augustExpenses = new ArrayList<>();
-                ArrayList<Entry> septemberExpenses = new ArrayList<>();
-                ArrayList<Entry> octoberExpenses = new ArrayList<>();
-                ArrayList<Entry> novemberExpenses = new ArrayList<>();
-                ArrayList<Entry> decemberExpenses = new ArrayList<>();
-
-                divideExpensesPerMonth(januaryExpenses, februaryExpenses, marchExpenses, aprilExpenses, mayExpenses, juneExpenses, julyExpenses, augustExpenses, septemberExpenses, octoberExpenses, novemberExpenses, decemberExpenses);
 
 
-                xAxis.setCategories(FXCollections.observableArrayList(Arrays.asList("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "December")));
+
+
+
+                xAxis.setCategories(FXCollections.observableArrayList(Arrays.asList("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec")));
                 yAxis.setLabel("Value");
 
-                barChart.setTitle("Monthly analysis");
+                barChart.setTitle("General overview");
 
+
+                updateStackedChart();
+
+
+            }
+
+            public void updateStackedChart() {
+                barChart.getData().clear();
+                clearExpenses(januaryExpenses, februaryExpenses, marchExpenses, aprilExpenses, mayExpenses, juneExpenses, julyExpenses, augustExpenses, septemberExpenses, octoberExpenses, novemberExpenses, decemberExpenses);
+                divideExpensesPerMonth(januaryExpenses, februaryExpenses, marchExpenses, aprilExpenses, mayExpenses, juneExpenses, julyExpenses, augustExpenses, septemberExpenses, octoberExpenses, novemberExpenses, decemberExpenses);
 
                 for (int i = 0; i < categoryList.size(); i++) {
                     XYChart.Series<String, Number> moneySpent = new XYChart.Series<>();
@@ -462,59 +446,85 @@
 
                     if (categoryTotalJanuary > 0) {
 
-                        moneySpent.getData().add(new XYChart.Data<>("January", categoryTotalJanuary));
+                        moneySpent.getData().add(new XYChart.Data<>("Jan", categoryTotalJanuary));
                     }
                     if (categoryTotalFebruary > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("February", categoryTotalFebruary));
+                        moneySpent.getData().add(new XYChart.Data<>("Feb", categoryTotalFebruary));
                     }
                     if (categoryTotalMarch > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("March", categoryTotalMarch));
+                        moneySpent.getData().add(new XYChart.Data<>("Mar", categoryTotalMarch));
                     }
                     if (categoryTotalApril > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("April", categoryTotalApril));
+                        moneySpent.getData().add(new XYChart.Data<>("Apr", categoryTotalApril));
                     }
                     if (categoryTotalMay > 0) {
                         moneySpent.getData().add(new XYChart.Data<>("May", categoryTotalMay));
                     }
                     if (categoryTotalJune > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("June", categoryTotalJune));
+                        moneySpent.getData().add(new XYChart.Data<>("Jun", categoryTotalJune));
                     }
                     if (categoryTotalJuly > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("July", categoryTotalJuly));
+                        moneySpent.getData().add(new XYChart.Data<>("Jul", categoryTotalJuly));
                     }
                     if (categoryTotalAugust > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("August", categoryTotalAugust));
+                        moneySpent.getData().add(new XYChart.Data<>("Aug", categoryTotalAugust));
                     }
                     if (categoryTotalSeptember > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("September", categoryTotalSeptember));
+                        moneySpent.getData().add(new XYChart.Data<>("Sept", categoryTotalSeptember));
                     }
                     if (categoryTotalOctober > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("October", categoryTotalOctober));
+                        moneySpent.getData().add(new XYChart.Data<>("Oct", categoryTotalOctober));
                     }
                     if (categoryTotalNovember > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("November", categoryTotalNovember));
+                        moneySpent.getData().add(new XYChart.Data<>("Nov", categoryTotalNovember));
                     }
                     if (categoryTotalDecember > 0) {
-                        moneySpent.getData().add(new XYChart.Data<>("December", categoryTotalDecember));
+                        moneySpent.getData().add(new XYChart.Data<>("Dec", categoryTotalDecember));
                     }
+
                     barChart.getData().add(moneySpent);
 
                     moneySpent.setName(categoryList.get(i));
 
                 }
-
-
-
-
-
-
-
-
-
-
-
             }
-                //START OF METHODS
+
+            public static void updateTrackers(ImageView budgetWarning, ObservableList<Budget> budgetList, ObservableList<Entry> rawEntryList) {
+                String thisMonth = new SimpleDateFormat("MM").format(Calendar.getInstance().getTime());
+                for (int i = 0; i < budgetList.size(); i++) {
+                    double temp = 0;
+                    for (int j = 0; j <rawEntryList.size();j++) {
+                        if (rawEntryList.get(j).getCategory().equals(budgetList.get(i).getBudgetCategory()) && rawEntryList.get(j).getMonth() == Integer.valueOf(thisMonth)) {
+                            temp += rawEntryList.get(j).getValue();
+                        }
+                    }
+
+                    double result = (temp / budgetList.get(i).getBudgetValue()) * 100;
+                    budgetList.get(i).setBudgetCurrent(result);
+
+                    if (result >= budgetList.get(i).getBudgetPercentage()) {
+                        budgetWarning.setVisible(true);
+                    }
+                }
+            }
+            //START OF METHODS
+
+
+
+            public void clearExpenses(ArrayList<Entry> januaryExpenses, ArrayList<Entry> februaryExpenses, ArrayList<Entry> marchExpenses, ArrayList<Entry> aprilExpenses, ArrayList<Entry> mayExpenses, ArrayList<Entry> juneExpenses, ArrayList<Entry> julyExpenses, ArrayList<Entry> augustExpenses, ArrayList<Entry> septemberExpenses, ArrayList<Entry> octoberExpenses, ArrayList<Entry> novemberExpenses, ArrayList<Entry> decemberExpenses) {
+                januaryExpenses.clear();
+                februaryExpenses.clear();
+                marchExpenses.clear();
+                aprilExpenses.clear();
+                mayExpenses.clear();
+                juneExpenses.clear();
+                julyExpenses.clear();
+                augustExpenses.clear();
+                septemberExpenses.clear();
+                octoberExpenses.clear();
+                novemberExpenses.clear();
+                decemberExpenses.clear();
+            }
 
 
 
@@ -558,14 +568,14 @@
             } else {
                 alertCategoryX.setVisible(true);
                 budgetCategoryChooser.setUnFocusColor(RED);
-                budgetErrorLabel.setVisible(true);
+
             }
             if (budgetValueTextField.getText().matches("[0-9.]{1,10}")) {
                 valueValidator = true;
             } else {
                 alertValueX.setVisible(true);
                 budgetValueTextField.setUnFocusColor(RED);
-                budgetErrorLabel.setVisible(true);
+
             }
 
             if (categoryValidator && valueValidator) {
@@ -574,7 +584,8 @@
                 budgetValueTextField.setUnFocusColor(Color.rgb(86, 164, 213));
                 alertCategoryX.setVisible(false);
                 alertValueX.setVisible(false);
-                budgetErrorLabel.setVisible(false);
+                updateTrackers(budgetWarning, budgetList, rawEntryList);
+
 
             }
 
@@ -597,17 +608,6 @@
     public void setInitialChartVisibilityAndActionSetter() {
         barChart.setVisible(false);
 
-        barChartButton.setOnAction((e -> {
-            piechart.setVisible(false);
-            barChart.setVisible(true);
-
-        }));
-
-        pieChartButton.setOnAction((e -> {
-            barChart.setVisible(false);
-            piechart.setVisible(true);
-
-        }));
     }
 
     public void filterPickerActionSetter() {
@@ -633,21 +633,34 @@
                 toDatePicker.setVisible(false);
 
             }}
+
         );
     }
 
     public void chartPickerActionSetter() {
         chartPicker.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
-            if (newValue == "Monthly") {
+            if (newValue == "Yearly") {
                 piechart.getData().clear();
+                piechart.setVisible(true);
+                barChart.setVisible(false);
 
                 monthlyDataChart();
-                }
-                if (newValue == "Category") {
+            }
+            if (newValue == "Category") {
+                piechart.setVisible(true);
+                barChart.setVisible(false);
                 categoryChartUpdater();
 
-            }}
-            );
+            }
+            if (newValue == "Mixed") {
+                barChart.getData().clear();
+                piechart.setVisible(false);
+                barChart.setVisible(true);
+                updateStackedChart();
+
+            }
+        }
+        );
 
     }
 
@@ -798,7 +811,7 @@
                     }
                     chartPicker.setValue("Category");
                     categoryChartUpdater();
-                    sum.setText(String.valueOf(getFilteredListSum()));
+                    sum.setText("$" + String.valueOf(getFilteredListSum()) + "0");
 
 
                 }
@@ -839,7 +852,7 @@
                         }
                         chartPicker.setValue("Category");
                         categoryChartUpdater();
-                        sum.setText(String.valueOf(getFilteredListSum()));
+                        sum.setText("$" + String.valueOf(getFilteredListSum()) + "0");
 
                     }
 
@@ -857,8 +870,8 @@
                     } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
-                    fromMillis = fromDate.getTime();
-                    System.out.println(fromMillis);
+                    fromMillis = fromDate.getTime() -32800000;
+
 
                 }
         );
@@ -882,7 +895,7 @@
 
     public void populateTableColums() {
         description.setCellValueFactory(new PropertyValueFactory<>("description"));
-        value.setCellValueFactory(cellData -> Bindings.format("%.2f", cellData.getValue().getValue()));
+        value.setCellValueFactory(cellData -> Bindings.format("$%.2f", cellData.getValue().getValue()));
         category.setCellValueFactory(new PropertyValueFactory<>("category"));
         date.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(String.valueOf(cellData.getValue().getMonth() + "/" +cellData.getValue().getDay())));
         table.setItems(displayedEntryList);
@@ -962,7 +975,12 @@
 
                 //removes the items selected
                 removeEntry(conn, table, rawEntryList, userid);
-                chartUpdater();
+                categoryChartUpdater();
+                updateTrackers(budgetWarning, budgetList, rawEntryList);
+                updateStackedChart();
+
+
+
             }
 
 
@@ -985,12 +1003,13 @@
 
 
     public void addEntryActionSetter(Connection conn, Database db) {
-        addEntry.setOnAction (e -> {
+
+            addEntry.setOnAction (e -> {
             boolean descriptionValidator = false;
             boolean dateValidator = false;
             boolean amountValidator = false;
             boolean categoryValidator = false;
-            System.out.println(descriptionTextField.getText());
+
             if (descriptionTextField.getText().matches("[A-Za-z0-9_.]{1,20}")) {
                 descriptionValidator = true;
             } else {
@@ -1000,6 +1019,7 @@
             }
 
             if (datePicker.getValue().toString().matches("[2]+[0]+[0-9]{2}+[-]+[0-9]{2}+[-]+[0-9]{2}")) {
+                dateValidator = true;
                 dateValidator = true;
             } else {
                 dateX.setVisible(true);
@@ -1038,7 +1058,11 @@
                 descriptionTextField.setUnFocusColor(Color.rgb(86, 164, 213));
                 valueTextField.setUnFocusColor(Color.rgb(86, 164, 213));
                 categoryPicker.setUnFocusColor(Color.rgb(86, 164, 213));
+                updateTrackers(budgetWarning, budgetList, rawEntryList);
+                updateStackedChart();
+
             }
+
 
             //CLEARING PICKERS
 
@@ -1110,7 +1134,7 @@
                 decemberTotal += rawEntryList.get(i).getValue();
 
             }
-            sum.setText(String.valueOf(getFilteredListSum()));
+            sum.setText("$" + String.valueOf(getFilteredListSum()) + "0");
 
 
 
@@ -1120,44 +1144,18 @@
         monthlyDataChart();
 
 
-        //BARCHART
-
-
-
-//        moneySpent.setName("Money spent");
-//        moneySpent.getData().add(new XYChart.Data<>("January", januaryTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("February", februaryTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("March", marchTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("April", aprilTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("May", mayTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("June", juneTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("July", julyTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("August", augustTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("September", septemberTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("October", octoberTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("November", novemberTotal));
-//        moneySpent.getData().add(new XYChart.Data<>("December", decemberTotal));
-//
-//        barChart.getData().add(moneySpent);
-
-
-
-
-
-
-        //LINE CHART
 
 
     }
 
 
-        private void populateBudgetTable() {
-        budgetCategory.setCellValueFactory(new PropertyValueFactory<Budget, String>("budgetCategory"));
-        budgetValue.setCellValueFactory(new PropertyValueFactory<Budget, Double>("budgetValue"));
-        budgetPercentage.setCellValueFactory(new PropertyValueFactory<Budget, Integer>("budgetPercentage"));
-        budgetCurrent.setCellValueFactory(new PropertyValueFactory<Budget, Integer>("budgetCurrent"));
-        budgetTable.setItems(budgetList);
-        budgetCategoryChooser.setItems(FXCollections.observableArrayList(categoryList));
+    private void populateBudgetTable() {
+                budgetCategory.setCellValueFactory(new PropertyValueFactory<Budget, String>("budgetCategory"));
+                budgetValue.setCellValueFactory(cellData -> Bindings.format("$%.2f", cellData.getValue().getBudgetValue()));
+                budgetPercentage.setCellValueFactory(cellData -> Bindings.format("%d%%", cellData.getValue().getBudgetPercentage()));
+                budgetCurrent.setCellValueFactory(cellData -> Bindings.format("%,.1f%%", cellData.getValue().budgetCurrentProperty()));
+                budgetTable.setItems(budgetList);
+                budgetCategoryChooser.setItems(FXCollections.observableArrayList(categoryList));
     }
 
 
@@ -1187,7 +1185,7 @@
                         new PieChart.Data("December: $" + decemberTotal, decemberTotal));
 
 
-        piechart.setTitle("Monthly analysis");
+
         piechart.setData(pieChartData);
     }
 
@@ -1207,7 +1205,7 @@
            pieChartData.add(new PieChart.Data(categoryList.get(i) + ": " + categoryTotal, categoryTotal));
         }
 
-        piechart.setTitle("Details per category:");
+
         piechart.setData(pieChartData);
 
     }

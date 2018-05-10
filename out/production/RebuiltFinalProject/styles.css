@@ -5,17 +5,29 @@
     -fx-background-color: #56a4d5;
     -fx-text-fill: WHITE;
 }
+
+.button-removeentry{
+    -fx-padding: 0.7em 0.57em;
+    -fx-font-size: 11px;
+    -jfx-button-type: FLAT;
+    -fx-background-color: #cc3333;
+    -fx-opacity: 0.7;
+    -fx-text-fill: WHITE;
+}
 .button-category{
     -fx-padding: 0.7em 0.57em;
-    -fx-font-size: 8px;
+    -fx-font-size: 10px;
     -jfx-button-type: RAISED;
-    -fx-text-fill: black;
+    -fx-text-fill: #56a4d5;
 }
 .button-removealert{
     -fx-padding: 0.7em 0.57em;
     -fx-font-size: 10px;
     -jfx-button-type: RAISED;
-    -fx-text-fill: #56a4d5;
+    -fx-text-fill: WHITE;
+    -fx-background-color: #cc3333;
+    -fx-opacity: 0.7;
+
 }
 /* Styling the slider thumb */
 .jfx-slider > .thumb {
@@ -36,4 +48,49 @@
 .jfx-slider .slider-value {
      -fx-fill: white;
      -fx-stroke: white;
+}
+
+.table-view {
+    -fx-font-size: 11px;
+}
+.table-view .column-header{
+    -fx-background-color: #56a4d5;
+}
+.table-view .column-header-background{
+    -fx-background-color: #56a4d5;
+}
+
+.table-view .column-header-background .label{
+     -fx-background-color: transparent;
+    -fx-font-weight:bold;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+}
+
+
+.table-row-cell:hover {
+    -fx-background-color: #56a4d5;
+    -fx-opacity: 0.5;
+}
+.table-row-cell:selected{
+    -fx-background-color: black;
+    -fx-opacity: 0.3;
+}
+.table-view .table-cell{
+    -fx-text-fill: #56a4d5;
+    -fx-background-color: transparent;
+    -fx-opacity: 1;
+    -fx-table-cell-border-color: white;
+}
+.table-view .table-row-cell:hover{
+    -fx-text-fill: black;
+    -fx-background-color: transparent;
+    -fx-opacity: 1;
+    -fx-table-cell-border-color: white;
+}
+
+.table-row-cell{
+    -fx-background-color: -fx-table-cell-border-color, white;
+    -fx-background-insets: 0, 0 0 0 0;
+    -fx-padding: 0.0em; /* 0 */
 }

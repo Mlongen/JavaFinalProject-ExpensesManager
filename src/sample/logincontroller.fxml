@@ -24,27 +24,48 @@
             <Image url="@createuser.jpg" />
          </image>
       </ImageView>
-      <JFXTextField fx:id="userTextField" focusColor="transparent" layoutX="277.0" layoutY="256.0" prefHeight="34.0" prefWidth="200.0" promptText="Username" style="-fx-text-fill: grey; -fx-background-color: transparent;" unFocusColor="transparent">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </JFXTextField>
-      <JFXPasswordField fx:id="passwordTextField" focusColor="transparent" layoutX="277.0" layoutY="310.0" prefHeight="34.0" prefWidth="200.0" promptText="Password" style="-fx-text-fill: grey;" unFocusColor="transparent">
-         <font>
-            <Font size="15.0" />
-         </font></JFXPasswordField>
       <Label fx:id="loginLabel" alignment="CENTER" layoutX="294.0" layoutY="201.0" prefHeight="36.0" prefWidth="200.0" style="-fx-background-color: white;" text="LOGIN" textFill="#56a4d5">
          <font>
             <Font name="D-DIN Condensed" size="30.0" />
          </font>
       </Label>
-      <JFXProgressBar fx:id="loginProgress" layoutX="294.0" layoutY="468.0" />
-      <JFXPasswordField fx:id="confirmPasswordTextField" focusColor="transparent" layoutX="277.0" layoutY="365.0" prefHeight="34.0" prefWidth="200.0" promptText="Confirm password" style="-fx-text-fill: grey;" unFocusColor="transparent">
+      <JFXProgressBar fx:id="loginProgress" layoutX="294.0" layoutY="459.0" prefHeight="5.0" />
+      <JFXButton fx:id="submitButton" layoutX="256.0" layoutY="418.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="submit-button" text="Submit" />
+      <JFXButton fx:id="cancelCreateUser" layoutX="402.0" layoutY="418.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="cancel-button" text="Cancel" />
+      <ImageView fx:id="userValidX" fitHeight="24.0" fitWidth="26.0" layoutX="539.0" layoutY="260.0" opacity="0.7" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@x.png" />
+         </image>
+      </ImageView>
+      <JFXTextField fx:id="userTextField" focusColor="transparent" labelFloat="true" layoutX="277.0" layoutY="256.0" prefHeight="34.0" prefWidth="200.0" promptText="Username" style="-fx-text-fill: grey; -fx-background-color: transparent;" unFocusColor="#57c72400">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </JFXTextField>
+      <JFXPasswordField fx:id="confirmPasswordTextField" focusColor="transparent" labelFloat="true" layoutX="277.0" layoutY="365.0" prefHeight="34.0" prefWidth="200.0" promptText="Confirm password" style="-fx-text-fill: grey;" unFocusColor="transparent">
          <font>
             <Font size="15.0" />
          </font>
       </JFXPasswordField>
-      <JFXButton fx:id="submitButton" layoutX="259.0" layoutY="418.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="submit-button" text="Submit" />
-      <JFXButton fx:id="cancelCreateUser" layoutX="402.0" layoutY="418.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="130.0" styleClass="cancel-button" text="Cancel" />
+      <JFXPasswordField fx:id="passwordTextField" focusColor="transparent" labelFloat="true" layoutX="277.0" layoutY="310.0" prefHeight="34.0" prefWidth="200.0" promptText="Password" style="-fx-text-fill: grey;" unFocusColor="transparent">
+         <font>
+            <Font size="15.0" />
+         </font></JFXPasswordField>
+      <ImageView fx:id="passwordValidX" fitHeight="24.0" fitWidth="26.0" layoutX="539.0" layoutY="315.0" opacity="0.7" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@x.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="24.0" fitWidth="26.0" layoutX="539.0" layoutY="371.0" opacity="0.7" pickOnBounds="true" preserveRatio="true" visible="false">
+         <image>
+            <Image url="@x.png" />
+         </image>
+      </ImageView>
+      <Label layoutX="333.0" layoutY="581.0" text="Created by Marcelo Longen">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Label>
+      <Label fx:id="invalidUserMessage" layoutX="260.0" layoutY="491.0" text="Please write a valid username and password." textFill="#ff0202" visible="false" />
    </children>
 </AnchorPane>

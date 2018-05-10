@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import static javafx.scene.paint.Color.RED;
 import static sample.Database.connect;
 
 
@@ -63,6 +64,15 @@ public class LoginController implements Initializable {
     @FXML
     private Label loginLabel;
 
+    @FXML
+    private ImageView userValidX;
+
+    @FXML
+    private ImageView passwordValidX;
+
+    @FXML
+    private Label invalidUserMessage;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -84,39 +94,58 @@ public class LoginController implements Initializable {
             confirmPasswordTextField.setVisible(true);
             createUserImage.setVisible(true);
             cancelCreateUser.setVisible(true);
+
         }));
 
-        submitButton.setOnAction((e -> {
-            if (!doesLoginExist(conn)) {
-                if (passwordTextField.getText().equals(confirmPasswordTextField.getText())) {
-                    loginProgress.setVisible(true);
-                    PauseTransition pt = new PauseTransition();
-                    pt.setDuration(Duration.seconds(1));
-                    pt.setOnFinished(ev -> {
-                        db.insertNewUser(conn, userTextField, passwordTextField);
-                        loginLabel.setText("LOGIN");
-                        submitButton.setVisible(false);
-                        confirmPasswordTextField.setVisible(false);
-                        createUserImage.setVisible(false);
-                        loginProgress.setVisible(false);
-                    });
-                    pt.play();
 
+
+
+        submitButton.setOnAction((e -> {
+            boolean validUser = false;
+            boolean validPassword = false;
+            if (userTextField.getText().matches("[A-Za-z0-9_.]{1,20}")) {
+                validUser = true;
+            } else {
+                userValidX.setVisible(true);
+            }
+            if (passwordTextField.getText().matches("[A-Za-z0-9_.]{1,20}")) {
+                validPassword = true;
+            } else {
+                passwordValidX.setVisible(true);
+            }
+            if (validUser && validPassword) {
+                if (!doesLoginExist(conn)) {
+                    if (passwordTextField.getText().equals(confirmPasswordTextField.getText())) {
+                        loginProgress.setVisible(true);
+                        PauseTransition pt = new PauseTransition();
+                        pt.setDuration(Duration.seconds(1.5));
+                        pt.setOnFinished(ev -> {
+                            db.insertNewUser(conn, userTextField, passwordTextField);
+                            loginLabel.setText("LOGIN");
+                            submitButton.setVisible(false);
+                            confirmPasswordTextField.setVisible(false);
+                            createUserImage.setVisible(false);
+                            loginProgress.setVisible(false);
+                            cancelCreateUser.setVisible(false);
+                        });
+                        pt.play();
+
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setHeaderText(null);
+                        alert.setContentText("Passwords do not match.");
+                        alert.setOnHidden(evt -> {});
+
+                        alert.show();
+                    }
                 } else {
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setHeaderText(null);
-                    alert.setContentText("Passwords do not match.");
+                    alert.setContentText("User already exists.");
                     alert.setOnHidden(evt -> {});
 
                     alert.show();
                 }
-            } else {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText(null);
-                alert.setContentText("User already exists.");
-                alert.setOnHidden(evt -> {});
-
-                alert.show();
             }
 
 
@@ -136,15 +165,38 @@ public class LoginController implements Initializable {
         loginProgress.setVisible(false);
 
         passwordTextField.setOnAction(e -> {
-            loginButtonPressed(db, conn);
+
+            loginRegex(db, conn);
         });
 
         loginButton.setOnAction((e ->{
-            loginButtonPressed(db, conn);
+            loginRegex(db, conn);
 
         }));
     }
 
+    public void loginRegex(Database db, Connection conn) {
+        boolean validUser = false;
+        boolean validPassword = false;
+        if (userTextField.getText().matches("[A-Za-z0-9_.]{1,20}")) {
+            validUser = true;
+        } else {
+            invalidUserMessage.setVisible(true);
+            userValidX.setVisible(true);
+            userTextField.setUnFocusColor(RED);
+
+        }
+        if (passwordTextField.getText().matches("[A-Za-z0-9_.]{1,20}")) {
+            validPassword = true;
+        } else {
+            passwordValidX.setVisible(true);
+            passwordTextField.setUnFocusColor(RED);
+            invalidUserMessage.setVisible(true);
+        }
+        if (validUser && validPassword) {
+            loginButtonPressed(db, conn);
+        }
+    }
 
 
     public void loginButtonPressed(Database db, Connection conn) {
@@ -184,7 +236,7 @@ public class LoginController implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("sample.fxml"));
             Parent root = (Parent) fxmlLoader.load();
             Stage loginStage = new Stage();
-            Scene afterLoginScene = new Scene(root, 1600, 800);
+            Scene afterLoginScene = new Scene(root, 1565, 720);
             loginStage.setScene(afterLoginScene);
             afterLoginScene.getStylesheets().add("styles.css");
             loginStage.show();
