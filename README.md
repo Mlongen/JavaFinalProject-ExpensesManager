@@ -10,7 +10,7 @@
 
 A Java Desktop application developed to help control day-to-day expenses. Can be compiled for both Windows and macOS.
 
- <img src="http://marcelo.co.technology/img/JavaProject.gif?raw=true" width="350px">
+ <img src="http://marcelo.co.technology/img/JavaFinalProject.gif?raw=true" width="785px">
 
  -The data is displayed on a table, which can be filtered by period/month and sorted. 
  
