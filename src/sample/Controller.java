@@ -1204,7 +1204,7 @@
             }
            pieChartData.add(new PieChart.Data(categoryList.get(i) + ": " + categoryTotal, categoryTotal));
         }
-
+        System.out.println("hi");
 
         piechart.setData(pieChartData);
 

@@ -1,0 +1,30 @@
+.loginButton{
+    -fx-padding: 0.7em 0.57em;
+    -fx-font-size: 14px;
+    -jfx-button-type: FLAT;
+    -fx-background-color: #3a7fc2;
+    -fx-text-fill: WHITE;
+}
+
+.createButton{
+    -fx-padding: 0.7em 0.57em;
+    -fx-font-size: 13px;
+    -jfx-button-type: FLAT;
+    -fx-background-color: green;
+    -fx-text-fill: WHITE;
+}
+
+.submit-button{
+    -fx-padding: 0.7em 0.57em;
+    -fx-font-size: 13px;
+    -jfx-button-type: FLAT;
+    -fx-background-color: green;
+    -fx-text-fill: WHITE;
+}
+.cancel-button{
+    -fx-padding: 0.7em 0.57em;
+    -fx-font-size: 13px;
+    -jfx-button-type: FLAT;
+    -fx-background-color: red;
+    -fx-text-fill: WHITE;
+}

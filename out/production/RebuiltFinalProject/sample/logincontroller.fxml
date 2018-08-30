@@ -42,15 +42,15 @@
             <Font size="15.0" />
          </font>
       </JFXTextField>
+      <JFXPasswordField fx:id="passwordTextField" focusColor="transparent" labelFloat="true" layoutX="277.0" layoutY="310.0" prefHeight="34.0" prefWidth="200.0" promptText="Password" style="-fx-text-fill: grey;" unFocusColor="transparent">
+         <font>
+            <Font size="15.0" />
+         </font></JFXPasswordField>
       <JFXPasswordField fx:id="confirmPasswordTextField" focusColor="transparent" labelFloat="true" layoutX="277.0" layoutY="365.0" prefHeight="34.0" prefWidth="200.0" promptText="Confirm password" style="-fx-text-fill: grey;" unFocusColor="transparent">
          <font>
             <Font size="15.0" />
          </font>
       </JFXPasswordField>
-      <JFXPasswordField fx:id="passwordTextField" focusColor="transparent" labelFloat="true" layoutX="277.0" layoutY="310.0" prefHeight="34.0" prefWidth="200.0" promptText="Password" style="-fx-text-fill: grey;" unFocusColor="transparent">
-         <font>
-            <Font size="15.0" />
-         </font></JFXPasswordField>
       <ImageView fx:id="passwordValidX" fitHeight="24.0" fitWidth="26.0" layoutX="539.0" layoutY="315.0" opacity="0.7" pickOnBounds="true" preserveRatio="true" visible="false">
          <image>
             <Image url="@x.png" />

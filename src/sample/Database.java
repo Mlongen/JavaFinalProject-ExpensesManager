@@ -23,6 +23,7 @@ public class Database {
     }
 
 
+
     public ArrayList<Entry> getEntryObjects() {
         return entryObjects;
     }

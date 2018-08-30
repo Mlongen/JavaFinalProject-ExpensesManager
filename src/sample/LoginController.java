@@ -40,6 +40,8 @@ public class LoginController implements Initializable {
     @FXML
     private JFXTextField userTextField;
 
+
+
     @FXML
     private JFXPasswordField passwordTextField;
 
@@ -83,10 +85,7 @@ public class LoginController implements Initializable {
 
         //Hide the create user button
 
-        submitButton.setVisible(false);
-        confirmPasswordTextField.setVisible(false);
-        createUserImage.setVisible(false);
-        cancelCreateUser.setVisible(false);
+        setVisibility(false);
 
         createACCButton.setOnAction((e -> {
             loginLabel.setText("CREATE ACCOUNT");
@@ -103,12 +102,12 @@ public class LoginController implements Initializable {
         submitButton.setOnAction((e -> {
             boolean validUser = false;
             boolean validPassword = false;
-            if (userTextField.getText().matches("[A-Za-z0-9_.]{1,20}")) {
+            if (userTextField.getText().matches("[A-Za-z0-9_.]{0,20}")) {
                 validUser = true;
             } else {
                 userValidX.setVisible(true);
             }
-            if (passwordTextField.getText().matches("[A-Za-z0-9_.]{1,20}")) {
+            if (passwordTextField.getText().matches("[A-Za-z0-9_.]{0,20}")) {
                 validPassword = true;
             } else {
                 passwordValidX.setVisible(true);
@@ -152,15 +151,7 @@ public class LoginController implements Initializable {
         }));
 
 
-
-        cancelCreateUser.setOnAction((e -> {
-            loginLabel.setText("LOGIN");
-            submitButton.setVisible(false);
-            confirmPasswordTextField.setVisible(false);
-            createUserImage.setVisible(false);
-            loginProgress.setVisible(false);
-            cancelCreateUser.setVisible(false);
-        }));
+        cancelUserActionSetter();
 
         loginProgress.setVisible(false);
 
@@ -173,6 +164,24 @@ public class LoginController implements Initializable {
             loginRegex(db, conn);
 
         }));
+    }
+
+    public void cancelUserActionSetter() {
+        cancelCreateUser.setOnAction((e -> {
+            loginLabel.setText("LOGIN");
+            submitButton.setVisible(false);
+            confirmPasswordTextField.setVisible(false);
+            createUserImage.setVisible(false);
+            loginProgress.setVisible(false);
+            cancelCreateUser.setVisible(false);
+        }));
+    }
+
+    public void setVisibility(boolean b) {
+        submitButton.setVisible(b);
+        confirmPasswordTextField.setVisible(b);
+        createUserImage.setVisible(b);
+        cancelCreateUser.setVisible(b);
     }
 
     public void loginRegex(Database db, Connection conn) {
