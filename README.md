@@ -12,9 +12,11 @@ A Java Desktop application developed to help control day-to-day expenses. Can be
 
  ![image](http://marcelo.co.technology/img/JavaProject.gif)
 
- *The data is displayed on a table, which can be filtered by period/month and sorted. 
- *User can easily track their expenses and visualize information on different kinds of charts.
- *User can set budgets for different categories, and be notified when they are close to being reached.
+ -The data is displayed on a table, which can be filtered by period/month and sorted. 
+ 
+ -User can easily track their expenses and visualize information on different kinds of charts.
+ 
+ -User can set budgets for different categories, and be notified when they are close to being reached.
 
 
 ## Author
